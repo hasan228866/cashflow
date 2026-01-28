@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cashflow | Manajemen Keuangan Pribadi</title>
+    <title>Privat Cashflow | Manajemen Keuangan Pribadi</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -15,6 +15,9 @@
             --success: #4cc9f0;
             --danger: #f72585;
             --warning: #f8961e;
+            --info: #7209b7;
+            --cash-color: #4cc9f0;
+            --ewallet-color: #7209b7;
             --dark: #212529;
             --light: #f8f9fa;
             --gray: #6c757d;
@@ -26,6 +29,8 @@
             --gradient-secondary: linear-gradient(135deg, #7209b7, #4361ee);
             --gradient-success: linear-gradient(135deg, #4cc9f0, #4895ef);
             --gradient-danger: linear-gradient(135deg, #f72585, #b5179e);
+            --gradient-cash: linear-gradient(135deg, #4cc9f0, #4895ef);
+            --gradient-ewallet: linear-gradient(135deg, #7209b7, #4361ee);
         }
         
         * {
@@ -159,7 +164,7 @@
         }
         
         .balance-input-container {
-            max-width: 400px;
+            max-width: 500px;
             margin: 0 auto;
         }
         
@@ -170,9 +175,21 @@
             color: var(--dark);
         }
         
+        .balance-inputs-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        @media (max-width: 768px) {
+            .balance-inputs-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
         .balance-input-wrapper {
             position: relative;
-            margin-bottom: 25px;
         }
         
         .balance-input-wrapper span {
@@ -200,6 +217,32 @@
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+        
+        .cash-input:focus {
+            border-color: var(--cash-color);
+            box-shadow: 0 0 0 3px rgba(76, 201, 240, 0.1);
+        }
+        
+        .ewallet-input:focus {
+            border-color: var(--ewallet-color);
+            box-shadow: 0 0 0 3px rgba(114, 9, 183, 0.1);
+        }
+        
+        .balance-type-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .balance-type-label.cash {
+            color: var(--cash-color);
+        }
+        
+        .balance-type-label.ewallet {
+            color: var(--ewallet-color);
         }
         
         .format-hint {
@@ -240,7 +283,15 @@
             border-top: 5px solid var(--danger);
         }
         
-        .stat-card.balance {
+        .stat-card.cash {
+            border-top: 5px solid var(--cash-color);
+        }
+        
+        .stat-card.ewallet {
+            border-top: 5px solid var(--ewallet-color);
+        }
+        
+        .stat-card.total {
             border-top: 5px solid var(--primary);
         }
         
@@ -270,7 +321,15 @@
             background: var(--gradient-danger);
         }
         
-        .balance .stat-icon {
+        .cash .stat-icon {
+            background: var(--gradient-cash);
+        }
+        
+        .ewallet .stat-icon {
+            background: var(--gradient-ewallet);
+        }
+        
+        .total .stat-icon {
             background: var(--gradient-primary);
         }
         
@@ -457,6 +516,63 @@
             color: var(--danger);
         }
         
+        /* Payment Method Selector */
+        .payment-method-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        
+        .method-option {
+            flex: 1;
+            text-align: center;
+            padding: 18px 10px;
+            border: 2px solid var(--gray-light);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .method-option i {
+            font-size: 24px;
+            transition: var(--transition);
+        }
+        
+        .method-option span {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        .method-option:hover {
+            transform: translateY(-2px);
+        }
+        
+        .method-option.active {
+            border-width: 3px;
+        }
+        
+        .method-option.cash.active {
+            border-color: var(--cash-color);
+            background: rgba(76, 201, 240, 0.08);
+        }
+        
+        .method-option.cash.active i {
+            color: var(--cash-color);
+        }
+        
+        .method-option.ewallet.active {
+            border-color: var(--ewallet-color);
+            background: rgba(114, 9, 183, 0.08);
+        }
+        
+        .method-option.ewallet.active i {
+            color: var(--ewallet-color);
+        }
+        
         /* Category Selector */
         .category-grid {
             display: grid;
@@ -580,6 +696,7 @@
             gap: 15px;
             font-size: 0.9rem;
             color: var(--gray);
+            flex-wrap: wrap;
         }
         
         .transaction-category {
@@ -588,6 +705,23 @@
             border-radius: 20px;
             font-size: 0.8rem;
             font-weight: 500;
+        }
+        
+        .transaction-payment {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .transaction-payment.cash {
+            background: rgba(76, 201, 240, 0.15);
+            color: var(--cash-color);
+        }
+        
+        .transaction-payment.ewallet {
+            background: rgba(114, 9, 183, 0.15);
+            color: var(--ewallet-color);
         }
         
         .transaction-amount {
@@ -862,19 +996,37 @@
             to { transform: translateY(0); opacity: 1; }
         }
         
-        /* Responsive Design */
+        /* Responsive Design untuk HP */
         @media (max-width: 768px) {
-            .header {
-                padding: 20px;
+            .app-container {
+                padding: 15px;
+                gap: 20px;
             }
             
-            .logo-text h1 {
-                font-size: 1.5rem;
+            .header {
+                padding: 20px;
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+            
+            .logo {
+                justify-content: center;
             }
             
             .user-actions {
                 width: 100%;
                 justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            .btn {
+                padding: 12px 16px;
+                font-size: 0.9rem;
+            }
+            
+            .dashboard-stats {
+                grid-template-columns: 1fr;
             }
             
             .stat-card {
@@ -889,8 +1041,14 @@
                 padding: 20px;
             }
             
+            .transaction-type-selector,
+            .payment-method-selector {
+                flex-direction: column;
+            }
+            
             .transaction-item {
                 flex-wrap: wrap;
+                padding: 15px;
             }
             
             .transaction-amount {
@@ -898,31 +1056,82 @@
                 text-align: right;
                 margin-top: 10px;
                 margin-left: 0;
+                font-size: 1.3rem;
             }
             
             .transaction-actions {
                 margin-left: auto;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .app-container {
-                padding: 15px;
-                gap: 20px;
+                margin-top: 10px;
             }
             
-            .dashboard-stats {
-                grid-template-columns: 1fr;
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
             }
             
             .filter-options {
-                width: 100%;
                 justify-content: center;
             }
             
             .transaction-meta {
                 flex-wrap: wrap;
                 gap: 8px;
+            }
+            
+            .balance-inputs-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .balance-input {
+                font-size: 1.3rem;
+                padding: 16px 16px 16px 45px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .app-container {
+                padding: 10px;
+                gap: 15px;
+            }
+            
+            .header {
+                padding: 15px;
+            }
+            
+            .logo-text h1 {
+                font-size: 1.5rem;
+            }
+            
+            .logo-icon {
+                width: 45px;
+                height: 45px;
+                font-size: 20px;
+            }
+            
+            .btn {
+                padding: 10px 14px;
+                font-size: 0.85rem;
+            }
+            
+            .card-header {
+                padding: 15px 15px 10px;
+            }
+            
+            .card-title {
+                font-size: 1.2rem;
+            }
+            
+            .card-body {
+                padding: 15px;
+            }
+            
+            .form-group {
+                margin-bottom: 15px;
+            }
+            
+            .form-control {
+                padding: 14px 16px;
+                font-size: 0.95rem;
             }
         }
         
@@ -952,6 +1161,37 @@
             margin-top: 5px;
             font-style: italic;
         }
+        
+        /* Mobile Menu Button (untuk HP) */
+        .mobile-menu-btn {
+            display: none;
+            background: transparent;
+            border: none;
+            font-size: 24px;
+            color: var(--primary);
+            cursor: pointer;
+            padding: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+                position: absolute;
+                top: 20px;
+                right: 20px;
+            }
+            
+            .user-actions.mobile-hidden {
+                display: none;
+            }
+            
+            .user-actions.mobile-visible {
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+                margin-top: 15px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -963,11 +1203,11 @@
                     <i class="fas fa-chart-line"></i>
                 </div>
                 <div class="logo-text">
-                    <h1>Cashflow</h1>
-                    <p>Kelola Keuangan Anda</p>
+                    <h1>Privat Cashflow</h1>
+                    <p>Kelola Keuangan Tunai & E-Wallet</p>
                 </div>
             </div>
-            <div class="user-actions">
+            <div class="user-actions" id="user-actions">
                 <button class="btn btn-outline" id="import-btn">
                     <i class="fas fa-file-import"></i> Import
                 </button>
@@ -984,9 +1224,25 @@
         <div class="initial-balance-section" id="initial-balance-section">
             <div class="balance-input-container">
                 <div class="balance-label">Masukkan Saldo Awal Anda</div>
-                <div class="balance-input-wrapper">
-                    <span>Rp</span>
-                    <input type="text" class="balance-input" id="initial-balance" placeholder="0" value="0">
+                <div class="balance-inputs-container">
+                    <div class="form-group">
+                        <div class="balance-type-label cash">
+                            <i class="fas fa-money-bill-wave"></i> Saldo Tunai
+                        </div>
+                        <div class="balance-input-wrapper">
+                            <span>Rp</span>
+                            <input type="text" class="balance-input cash-input" id="initial-cash-balance" placeholder="0" value="0">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="balance-type-label ewallet">
+                            <i class="fas fa-mobile-alt"></i> Saldo E-Wallet
+                        </div>
+                        <div class="balance-input-wrapper">
+                            <span>Rp</span>
+                            <input type="text" class="balance-input ewallet-input" id="initial-ewallet-balance" placeholder="0" value="0">
+                        </div>
+                    </div>
                 </div>
                 <div class="format-hint">
                     <p><i class="fas fa-info-circle"></i> Gunakan titik untuk ribuan: <strong>1.000.000</strong> (satu juta)</p>
@@ -1030,17 +1286,47 @@
                 </div>
             </div>
             
-            <div class="stat-card balance">
+            <div class="stat-card cash">
                 <div class="stat-header">
                     <div>
-                        <div class="stat-title">Saldo Saat Ini</div>
-                        <div class="stat-value" id="total-balance">Rp 0</div>
+                        <div class="stat-title">Saldo Tunai</div>
+                        <div class="stat-value" id="cash-balance">Rp 0</div>
                         <div class="stat-change">
-                            <i class="fas fa-wallet"></i> <span id="balance-percentage">0%</span> dari bulan lalu
+                            <i class="fas fa-wallet"></i> <span id="cash-percentage">0%</span> dari bulan lalu
                         </div>
                     </div>
                     <div class="stat-icon">
-                        <i class="fas fa-wallet"></i>
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card ewallet">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-title">Saldo E-Wallet</div>
+                        <div class="stat-value" id="ewallet-balance">Rp 0</div>
+                        <div class="stat-change">
+                            <i class="fas fa-mobile-alt"></i> <span id="ewallet-percentage">0%</span> dari bulan lalu
+                        </div>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card total">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-title">Total Saldo</div>
+                        <div class="stat-value" id="total-balance">Rp 0</div>
+                        <div class="stat-change">
+                            <i class="fas fa-chart-line"></i> <span id="balance-percentage">0%</span> dari bulan lalu
+                        </div>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-chart-pie"></i>
                     </div>
                 </div>
             </div>
@@ -1062,6 +1348,17 @@
                         <div class="type-option expense" data-type="expense">
                             <i class="fas fa-arrow-up"></i>
                             <span>Uang Keluar</span>
+                        </div>
+                    </div>
+                    
+                    <div class="payment-method-selector">
+                        <div class="method-option cash active" data-method="cash">
+                            <i class="fas fa-money-bill-wave"></i>
+                            <span>Tunai</span>
+                        </div>
+                        <div class="method-option ewallet" data-method="ewallet">
+                            <i class="fas fa-mobile-alt"></i>
+                            <span>E-Wallet</span>
                         </div>
                     </div>
                     
@@ -1098,7 +1395,7 @@
                             </div>
                             <div class="category-option" data-category="transportasi">
                                 <i class="fas fa-car"></i>
-                                <span>Transportasi</span>
+                                <span>Transfer</span>
                             </div>
                             <div class="category-option" data-category="hiburan">
                                 <i class="fas fa-film"></i>
@@ -1152,8 +1449,9 @@
                             <button class="filter-btn" data-filter="expense">Pengeluaran</button>
                         </div>
                         <div class="filter-options">
-                            <button class="filter-btn" data-sort="date">Terbaru</button>
-                            <button class="filter-btn" data-sort="amount">Jumlah Tertinggi</button>
+                            <button class="filter-btn active" data-payment="all">Semua</button>
+                            <button class="filter-btn" data-payment="cash">Tunai</button>
+                            <button class="filter-btn" data-payment="ewallet">E-Wallet</button>
                         </div>
                     </div>
                     
@@ -1173,7 +1471,7 @@
         
         <!-- Footer -->
         <footer class="footer">
-            <p>Privat Cashflow | Menghitung semua uang masuk dan keluar</p>
+            <p>Privat Cashflow | Kelola Keuangan Tunai & E-Wallet dengan Mudah</p>
         </footer>
     </div>
     
@@ -1192,7 +1490,7 @@
                         </div>
                         <div class="export-info">
                             <h4>Excel Format (.xlsx)</h4>
-                            <p>Format Excel lengkap dengan saldo awal dan semua transaksi</p>
+                            <p>Format Excel lengkap dengan saldo tunai, e-wallet, dan semua transaksi</p>
                         </div>
                     </div>
                     <div class="export-option" data-format="json">
@@ -1214,7 +1512,7 @@
     </div>
     
     <script>
-        // Inisialisasi aplikasi - MULAI DARI 0
+        // Inisialisasi aplikasi
         document.addEventListener('DOMContentLoaded', function() {
             // Set tanggal hari ini sebagai default
             const today = new Date().toISOString().split('T')[0];
@@ -1228,14 +1526,19 @@
             
             // Check if user sudah setup saldo awal
             checkInitialSetup();
+            
+            // Optimasi untuk HP
+            optimizeForMobile();
         });
         
-        // Variabel global - SEMUA DIMULAI DARI 0
+        // Variabel global
         let transactions = [];
         let nextId = 1;
         let currentFilter = 'all';
+        let currentPaymentFilter = 'all';
         let currentSort = 'date';
-        let initialBalance = 0;
+        let initialCashBalance = 0;
+        let initialEwalletBalance = 0;
         let isInitialBalanceSet = false;
         
         // Kategori dengan ikon
@@ -1243,7 +1546,7 @@
             'gaji': { name: 'Gaji', icon: 'fas fa-money-bill-wave', color: '#4cc9f0' },
             'investasi': { name: 'Investasi', icon: 'fas fa-chart-line', color: '#7209b7' },
             'makanan': { name: 'Makanan', icon: 'fas fa-utensils', color: '#f8961e' },
-            'transportasi': { name: 'Transportasi', icon: 'fas fa-car', color: '#4361ee' },
+            'transportasi': { name: 'Transfer', icon: 'fas fa-car', color: '#4361ee' },
             'hiburan': { name: 'Hiburan', icon: 'fas fa-film', color: '#f72585' },
             'belanja': { name: 'Belanja', icon: 'fas fa-shopping-bag', color: '#3a0ca3' },
             'kesehatan': { name: 'Kesehatan', icon: 'fas fa-heartbeat', color: '#2ecc71' },
@@ -1256,6 +1559,14 @@
             document.querySelectorAll('.type-option').forEach(option => {
                 option.addEventListener('click', function() {
                     document.querySelectorAll('.type-option').forEach(opt => opt.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            // Pilih metode pembayaran
+            document.querySelectorAll('.method-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.method-option').forEach(opt => opt.classList.remove('active'));
                     this.classList.add('active');
                 });
             });
@@ -1274,12 +1585,22 @@
             // Simpan transaksi
             document.getElementById('save-transaction').addEventListener('click', saveTransaction);
             
-            // Tombol filter
+            // Tombol filter transaksi
             document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
                 btn.addEventListener('click', function() {
                     document.querySelectorAll('.filter-btn[data-filter]').forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
                     currentFilter = this.getAttribute('data-filter');
+                    renderTransactions();
+                });
+            });
+            
+            // Tombol filter pembayaran
+            document.querySelectorAll('.filter-btn[data-payment]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-btn[data-payment]').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentPaymentFilter = this.getAttribute('data-payment');
                     renderTransactions();
                 });
             });
@@ -1309,7 +1630,8 @@
             document.getElementById('clear-all-btn').addEventListener('click', clearAllData);
             
             // Format otomatis untuk input jumlah
-            document.getElementById('initial-balance').addEventListener('input', formatCurrencyInput);
+            document.getElementById('initial-cash-balance').addEventListener('input', formatCurrencyInput);
+            document.getElementById('initial-ewallet-balance').addEventListener('input', formatCurrencyInput);
             document.getElementById('transaction-amount').addEventListener('input', formatCurrencyInput);
             
             // Enter key untuk menyimpan transaksi
@@ -1322,9 +1644,27 @@
             });
             
             // Enter key untuk saldo awal
-            document.getElementById('initial-balance').addEventListener('keypress', function(e) {
+            document.getElementById('initial-cash-balance').addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') document.getElementById('save-initial-balance').click();
             });
+            
+            document.getElementById('initial-ewallet-balance').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') document.getElementById('save-initial-balance').click();
+            });
+        }
+        
+        // Optimasi untuk tampilan HP
+        function optimizeForMobile() {
+            // Sembunyikan action buttons di HP untuk ruang lebih
+            if (window.innerWidth <= 768) {
+                const transactionItems = document.querySelectorAll('.transaction-item');
+                transactionItems.forEach(item => {
+                    const actions = item.querySelector('.transaction-actions');
+                    if (actions) {
+                        actions.classList.add('mobile-hidden');
+                    }
+                });
+            }
         }
         
         // Fungsi untuk format input mata uang otomatis
@@ -1371,13 +1711,15 @@
             if (savedData) {
                 const data = JSON.parse(savedData);
                 isInitialBalanceSet = data.isInitialBalanceSet || false;
-                initialBalance = data.initialBalance || 0;
+                initialCashBalance = data.initialCashBalance || 0;
+                initialEwalletBalance = data.initialEwalletBalance || 0;
                 
                 if (isInitialBalanceSet) {
                     // Sembunyikan section saldo awal
                     document.getElementById('initial-balance-section').classList.add('hidden');
                     // Format saldo awal di input
-                    document.getElementById('initial-balance').value = formatNumber(initialBalance);
+                    document.getElementById('initial-cash-balance').value = formatNumber(initialCashBalance);
+                    document.getElementById('initial-ewallet-balance').value = formatNumber(initialEwalletBalance);
                     // Update dashboard
                     updateDashboard();
                     renderTransactions();
@@ -1387,15 +1729,16 @@
         
         // Simpan saldo awal
         function saveInitialBalance() {
-            const balanceInput = document.getElementById('initial-balance');
-            const balance = parseCurrencyInput(balanceInput.value);
+            const cashBalance = parseCurrencyInput(document.getElementById('initial-cash-balance').value);
+            const ewalletBalance = parseCurrencyInput(document.getElementById('initial-ewallet-balance').value);
             
-            if (balance < 0) {
+            if (cashBalance < 0 || ewalletBalance < 0) {
                 showNotification('Saldo tidak boleh negatif', 'error');
                 return;
             }
             
-            initialBalance = balance;
+            initialCashBalance = cashBalance;
+            initialEwalletBalance = ewalletBalance;
             isInitialBalanceSet = true;
             
             // Sembunyikan section saldo awal
@@ -1408,7 +1751,7 @@
             saveToLocalStorage();
             
             // Tampilkan notifikasi
-            showNotification(`Saldo awal sebesar ${formatCurrency(balance)} berhasil disimpan`, 'success');
+            showNotification(`Saldo awal berhasil disimpan: Tunai ${formatCurrency(cashBalance)}, E-Wallet ${formatCurrency(ewalletBalance)}`, 'success');
         }
         
         // Simpan transaksi baru
@@ -1447,6 +1790,9 @@
             // Ambil jenis transaksi yang dipilih
             const type = document.querySelector('.type-option.active').getAttribute('data-type');
             
+            // Ambil metode pembayaran yang dipilih
+            const paymentMethod = document.querySelector('.method-option.active').getAttribute('data-method');
+            
             // Ambil kategori yang dipilih
             const category = document.querySelector('.category-option.active').getAttribute('data-category');
             
@@ -1454,6 +1800,7 @@
             const transaction = {
                 id: nextId++,
                 type: type,
+                paymentMethod: paymentMethod,
                 name: name,
                 amount: amount,
                 category: category,
@@ -1512,8 +1859,14 @@
             // Filter transaksi
             let filteredTransactions = [...transactions];
             
+            // Filter berdasarkan jenis transaksi
             if (currentFilter !== 'all') {
                 filteredTransactions = filteredTransactions.filter(t => t.type === currentFilter);
+            }
+            
+            // Filter berdasarkan metode pembayaran
+            if (currentPaymentFilter !== 'all') {
+                filteredTransactions = filteredTransactions.filter(t => t.paymentMethod === currentPaymentFilter);
             }
             
             // Sort transaksi
@@ -1554,6 +1907,10 @@
                             <div class="transaction-name">${transaction.name}</div>
                             <div class="transaction-meta">
                                 <span class="transaction-category">${category.name}</span>
+                                <span class="transaction-payment ${transaction.paymentMethod}">
+                                    <i class="fas ${transaction.paymentMethod === 'cash' ? 'fa-money-bill-wave' : 'fa-mobile-alt'}"></i>
+                                    ${transaction.paymentMethod === 'cash' ? 'Tunai' : 'E-Wallet'}
+                                </span>
                                 <span class="transaction-date">${formattedDate}</span>
                                 ${transaction.note ? `<span><i class="fas fa-sticky-note"></i> ${transaction.note}</span>` : ''}
                             </div>
@@ -1571,36 +1928,72 @@
             });
             
             container.innerHTML = html;
+            
+            // Optimasi untuk HP setelah render
+            optimizeForMobile();
         }
         
-        // Update dashboard - PERHITUNGAN LENGKAP
+        // Update dashboard dengan perhitungan tunai dan e-wallet
         function updateDashboard() {
             // Hitung total pemasukan dan pengeluaran
             let totalIncome = 0;
             let totalExpense = 0;
+            let cashIncome = 0;
+            let cashExpense = 0;
+            let ewalletIncome = 0;
+            let ewalletExpense = 0;
             
             transactions.forEach(transaction => {
                 if (transaction.type === 'income') {
                     totalIncome += transaction.amount;
+                    if (transaction.paymentMethod === 'cash') {
+                        cashIncome += transaction.amount;
+                    } else {
+                        ewalletIncome += transaction.amount;
+                    }
                 } else {
                     totalExpense += transaction.amount;
+                    if (transaction.paymentMethod === 'cash') {
+                        cashExpense += transaction.amount;
+                    } else {
+                        ewalletExpense += transaction.amount;
+                    }
                 }
             });
             
-            // Hitung saldo saat ini (saldo awal + pemasukan - pengeluaran)
-            const currentBalance = initialBalance + totalIncome - totalExpense;
+            // Hitung saldo saat ini
+            const currentCashBalance = initialCashBalance + cashIncome - cashExpense;
+            const currentEwalletBalance = initialEwalletBalance + ewalletIncome - ewalletExpense;
+            const totalBalance = currentCashBalance + currentEwalletBalance;
             
-            // Update elemen
+            // Update elemen dashboard
             document.getElementById('total-income').textContent = formatCurrency(totalIncome);
             document.getElementById('total-expense').textContent = formatCurrency(totalExpense);
-            document.getElementById('total-balance').textContent = formatCurrency(currentBalance);
+            document.getElementById('cash-balance').textContent = formatCurrency(currentCashBalance);
+            document.getElementById('ewallet-balance').textContent = formatCurrency(currentEwalletBalance);
+            document.getElementById('total-balance').textContent = formatCurrency(totalBalance);
             
             // Update warna saldo jika negatif
-            const balanceElement = document.getElementById('total-balance');
-            if (currentBalance < 0) {
-                balanceElement.style.color = '#f72585';
+            const cashBalanceElement = document.getElementById('cash-balance');
+            const ewalletBalanceElement = document.getElementById('ewallet-balance');
+            const totalBalanceElement = document.getElementById('total-balance');
+            
+            if (currentCashBalance < 0) {
+                cashBalanceElement.style.color = '#f72585';
             } else {
-                balanceElement.style.color = 'var(--dark)';
+                cashBalanceElement.style.color = 'var(--dark)';
+            }
+            
+            if (currentEwalletBalance < 0) {
+                ewalletBalanceElement.style.color = '#f72585';
+            } else {
+                ewalletBalanceElement.style.color = 'var(--dark)';
+            }
+            
+            if (totalBalance < 0) {
+                totalBalanceElement.style.color = '#f72585';
+            } else {
+                totalBalanceElement.style.color = 'var(--dark)';
             }
         }
         
@@ -1645,36 +2038,59 @@
             // Hitung total
             let totalIncome = 0;
             let totalExpense = 0;
+            let cashIncome = 0;
+            let cashExpense = 0;
+            let ewalletIncome = 0;
+            let ewalletExpense = 0;
             
             transactions.forEach(transaction => {
                 if (transaction.type === 'income') {
                     totalIncome += transaction.amount;
+                    if (transaction.paymentMethod === 'cash') {
+                        cashIncome += transaction.amount;
+                    } else {
+                        ewalletIncome += transaction.amount;
+                    }
                 } else {
                     totalExpense += transaction.amount;
+                    if (transaction.paymentMethod === 'cash') {
+                        cashExpense += transaction.amount;
+                    } else {
+                        ewalletExpense += transaction.amount;
+                    }
                 }
             });
             
-            const currentBalance = initialBalance + totalIncome - totalExpense;
+            const currentCashBalance = initialCashBalance + cashIncome - cashExpense;
+            const currentEwalletBalance = initialEwalletBalance + ewalletIncome - ewalletExpense;
+            const totalBalance = currentCashBalance + currentEwalletBalance;
             
             // Buat data untuk sheet Summary
             const summaryData = [
-                ['LAPORAN KEUANGAN - CASHFLOW'],
+                ['LAPORAN KEUANGAN - CASHFLOW PRO'],
                 ['Periode:', 'Semua Data'],
                 ['Tanggal Export:', new Date().toLocaleDateString('id-ID')],
                 [''],
-                ['INFORMASI SALDO'],
-                ['Saldo Awal:', formatCurrency(initialBalance)],
+                ['INFORMASI SALDO AWAL'],
+                ['Saldo Tunai Awal:', formatCurrency(initialCashBalance)],
+                ['Saldo E-Wallet Awal:', formatCurrency(initialEwalletBalance)],
+                ['Total Saldo Awal:', formatCurrency(initialCashBalance + initialEwalletBalance)],
+                [''],
+                ['RINGKASAN TRANSAKSI'],
                 ['Total Pemasukan:', formatCurrency(totalIncome)],
                 ['Total Pengeluaran:', formatCurrency(totalExpense)],
-                ['Saldo Saat Ini:', formatCurrency(currentBalance)],
-                ['Jumlah Transaksi:', transactions.length],
                 [''],
-                ['RINGKASAN TRANSAKSI']
+                ['SALDO SAAT INI'],
+                ['Saldo Tunai:', formatCurrency(currentCashBalance)],
+                ['Saldo E-Wallet:', formatCurrency(currentEwalletBalance)],
+                ['Total Saldo:', formatCurrency(totalBalance)],
+                [''],
+                ['JUMLAH TRANSAKSI:', transactions.length]
             ];
             
             // Buat data untuk sheet Transaksi
             const transactionsData = [
-                ['No', 'Tanggal', 'Jenis', 'Nama Transaksi', 'Kategori', 'Jumlah', 'Catatan']
+                ['No', 'Tanggal', 'Jenis', 'Metode', 'Nama Transaksi', 'Kategori', 'Jumlah', 'Catatan']
             ];
             
             // Urutkan berdasarkan tanggal
@@ -1682,12 +2098,14 @@
             
             sortedTransactions.forEach((transaction, index) => {
                 const type = transaction.type === 'income' ? 'Pemasukan' : 'Pengeluaran';
+                const paymentMethod = transaction.paymentMethod === 'cash' ? 'Tunai' : 'E-Wallet';
                 const category = categories[transaction.category].name;
                 
                 transactionsData.push([
                     index + 1,
                     formatDateForExport(transaction.date),
                     type,
+                    paymentMethod,
                     transaction.name,
                     category,
                     transaction.amount,
@@ -1707,7 +2125,7 @@
             XLSX.utils.book_append_sheet(wb, wsTransactions, 'Transaksi');
             
             // Buat nama file
-            const fileName = `cashflow_report_${new Date().toISOString().slice(0, 10)}.xlsx`;
+            const fileName = `cashflow_pro_report_${new Date().toISOString().slice(0, 10)}.xlsx`;
             
             // Export ke file Excel
             XLSX.writeFile(wb, fileName);
@@ -1720,17 +2138,18 @@
             const exportData = {
                 metadata: {
                     exportDate: new Date().toISOString(),
-                    appName: 'Cashflow - Mulai dari 0',
-                    appVersion: '1.0'
+                    appName: 'Cashflow Pro',
+                    appVersion: '2.0'
                 },
-                initialBalance: initialBalance,
+                initialCashBalance: initialCashBalance,
+                initialEwalletBalance: initialEwalletBalance,
                 isInitialBalanceSet: isInitialBalanceSet,
                 transactionCount: transactions.length,
                 transactions: transactions
             };
             
             const jsonString = JSON.stringify(exportData, null, 2);
-            const fileName = `cashflow_backup_${new Date().toISOString().slice(0, 10)}.json`;
+            const fileName = `cashflow_pro_backup_${new Date().toISOString().slice(0, 10)}.json`;
             
             // Download file
             downloadFile(jsonString, fileName, 'application/json');
@@ -1815,6 +2234,14 @@
                 notification.innerHTML = `<i class="fas fa-info-circle"></i> ${message}`;
             }
             
+            // Responsif untuk HP
+            if (window.innerWidth <= 768) {
+                notification.style.top = '20px';
+                notification.style.right = '20px';
+                notification.style.left = '20px';
+                notification.style.maxWidth = 'calc(100% - 40px)';
+            }
+            
             // Tambahkan ke body
             document.body.appendChild(notification);
             
@@ -1852,7 +2279,8 @@
             const data = {
                 transactions: transactions,
                 nextId: nextId,
-                initialBalance: initialBalance,
+                initialCashBalance: initialCashBalance,
+                initialEwalletBalance: initialEwalletBalance,
                 isInitialBalanceSet: isInitialBalanceSet,
                 lastUpdate: new Date().toISOString()
             };
@@ -1867,7 +2295,8 @@
                 const data = JSON.parse(savedData);
                 transactions = data.transactions || [];
                 nextId = data.nextId || 1;
-                initialBalance = data.initialBalance || 0;
+                initialCashBalance = data.initialCashBalance || 0;
+                initialEwalletBalance = data.initialEwalletBalance || 0;
                 isInitialBalanceSet = data.isInitialBalanceSet || false;
             }
         }

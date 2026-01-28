@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.ably.com/lib/ably.min-1.js"></script>
     <style>
         :root {
             --primary: #4361ee;
@@ -1192,6 +1193,16 @@
                 margin-top: 15px;
             }
         }
+        /* Tambahkan di bagian CSS */
+@keyframes slideInUp {
+    from { transform: translateY(100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideOutDown {
+    from { transform: translateY(0); opacity: 1; }
+    to { transform: translateY(100%); opacity: 0; }
+}
     </style>
 </head>
 <body>
@@ -1512,305 +1523,634 @@
     </div>
     
     <script>
-        // Inisialisasi aplikasi
-        document.addEventListener('DOMContentLoaded', function() {
-            // Set tanggal hari ini sebagai default
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('transaction-date').value = today;
-            
-            // Setup event listeners
-            setupEventListeners();
-            
-            // Load data dari localStorage (jika ada)
-            loadFromLocalStorage();
-            
-            // Check if user sudah setup saldo awal
-            checkInitialSetup();
-            
-            // Optimasi untuk HP
-            optimizeForMobile();
-        });
-        
-        // Variabel global
-        let transactions = [];
-        let nextId = 1;
-        let currentFilter = 'all';
-        let currentPaymentFilter = 'all';
-        let currentSort = 'date';
-        let initialCashBalance = 0;
-        let initialEwalletBalance = 0;
-        let isInitialBalanceSet = false;
-        
-        // Kategori dengan ikon
-        const categories = {
-            'gaji': { name: 'Gaji', icon: 'fas fa-money-bill-wave', color: '#4cc9f0' },
-            'investasi': { name: 'Investasi', icon: 'fas fa-chart-line', color: '#7209b7' },
-            'makanan': { name: 'Makanan', icon: 'fas fa-utensils', color: '#f8961e' },
-            'transportasi': { name: 'Transfer', icon: 'fas fa-car', color: '#4361ee' },
-            'hiburan': { name: 'Hiburan', icon: 'fas fa-film', color: '#f72585' },
-            'belanja': { name: 'Belanja', icon: 'fas fa-shopping-bag', color: '#3a0ca3' },
-            'kesehatan': { name: 'Kesehatan', icon: 'fas fa-heartbeat', color: '#2ecc71' },
-            'lainnya': { name: 'Lainnya', icon: 'fas fa-ellipsis-h', color: '#6c757d' }
-        };
+    // Inisialisasi aplikasi
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set tanggal hari ini sebagai default
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('transaction-date').value = today;
         
         // Setup event listeners
-        function setupEventListeners() {
-            // Pilih jenis transaksi
-            document.querySelectorAll('.type-option').forEach(option => {
-                option.addEventListener('click', function() {
-                    document.querySelectorAll('.type-option').forEach(opt => opt.classList.remove('active'));
-                    this.classList.add('active');
-                });
-            });
-            
-            // Pilih metode pembayaran
-            document.querySelectorAll('.method-option').forEach(option => {
-                option.addEventListener('click', function() {
-                    document.querySelectorAll('.method-option').forEach(opt => opt.classList.remove('active'));
-                    this.classList.add('active');
-                });
-            });
-            
-            // Pilih kategori
-            document.querySelectorAll('.category-option').forEach(option => {
-                option.addEventListener('click', function() {
-                    document.querySelectorAll('.category-option').forEach(opt => opt.classList.remove('active'));
-                    this.classList.add('active');
-                });
-            });
-            
-            // Simpan saldo awal
-            document.getElementById('save-initial-balance').addEventListener('click', saveInitialBalance);
-            
-            // Simpan transaksi
-            document.getElementById('save-transaction').addEventListener('click', saveTransaction);
-            
-            // Tombol filter transaksi
-            document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    document.querySelectorAll('.filter-btn[data-filter]').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    currentFilter = this.getAttribute('data-filter');
-                    renderTransactions();
-                });
-            });
-            
-            // Tombol filter pembayaran
-            document.querySelectorAll('.filter-btn[data-payment]').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    document.querySelectorAll('.filter-btn[data-payment]').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    currentPaymentFilter = this.getAttribute('data-payment');
-                    renderTransactions();
-                });
-            });
-            
-            // Tombol sort
-            document.querySelectorAll('.filter-btn[data-sort]').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    document.querySelectorAll('.filter-btn[data-sort]').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    currentSort = this.getAttribute('data-sort');
-                    renderTransactions();
-                });
-            });
-            
-            // Tombol tambah transaksi di header
-            document.getElementById('add-transaction-btn').addEventListener('click', function() {
-                document.getElementById('transaction-name').focus();
-            });
-            
-            // Tombol export data
-            document.getElementById('export-btn').addEventListener('click', showExportModal);
-            document.getElementById('close-export-modal').addEventListener('click', closeExportModal);
-            document.getElementById('cancel-export').addEventListener('click', closeExportModal);
-            document.getElementById('confirm-export').addEventListener('click', exportData);
-            
-            // Tombol hapus semua
-            document.getElementById('clear-all-btn').addEventListener('click', clearAllData);
-            
-            // Format otomatis untuk input jumlah
-            document.getElementById('initial-cash-balance').addEventListener('input', formatCurrencyInput);
-            document.getElementById('initial-ewallet-balance').addEventListener('input', formatCurrencyInput);
-            document.getElementById('transaction-amount').addEventListener('input', formatCurrencyInput);
-            
-            // Enter key untuk menyimpan transaksi
-            document.getElementById('transaction-name').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') document.getElementById('save-transaction').click();
-            });
-            
-            document.getElementById('transaction-amount').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') document.getElementById('save-transaction').click();
-            });
-            
-            // Enter key untuk saldo awal
-            document.getElementById('initial-cash-balance').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') document.getElementById('save-initial-balance').click();
-            });
-            
-            document.getElementById('initial-ewallet-balance').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') document.getElementById('save-initial-balance').click();
-            });
-        }
+        setupEventListeners();
         
-        // Optimasi untuk tampilan HP
-        function optimizeForMobile() {
-            // Sembunyikan action buttons di HP untuk ruang lebih
-            if (window.innerWidth <= 768) {
-                const transactionItems = document.querySelectorAll('.transaction-item');
-                transactionItems.forEach(item => {
-                    const actions = item.querySelector('.transaction-actions');
-                    if (actions) {
-                        actions.classList.add('mobile-hidden');
-                    }
-                });
-            }
-        }
+        // Load data dari localStorage (jika ada)
+        loadFromLocalStorage();
         
-        // Fungsi untuk format input mata uang otomatis
-        function formatCurrencyInput(e) {
-            const input = e.target;
-            let value = input.value.replace(/[^\d,]/g, ''); // Hapus semua kecuali digit dan koma
-            
-            // Hapus semua titik yang ada (kita akan tambahkan kembali nanti)
-            value = value.replace(/\./g, '');
-            
-            // Pisahkan bagian integer dan decimal
-            let integerPart = value;
-            let decimalPart = '';
-            
-            // Jika ada koma, pisahkan bagian decimal
-            if (value.includes(',')) {
-                const parts = value.split(',');
-                integerPart = parts[0];
-                decimalPart = parts[1] ? ',' + parts[1].substring(0, 2) : ''; // Maksimal 2 digit decimal
-            }
-            
-            // Format integer part dengan titik setiap 3 digit
-            if (integerPart.length > 0) {
-                integerPart = parseInt(integerPart, 10).toLocaleString('id-ID');
-            }
-            
-            // Gabungkan kembali
-            input.value = integerPart + decimalPart;
-        }
+        // Check if user sudah setup saldo awal
+        checkInitialSetup();
         
-        // Fungsi untuk mengubah format mata uang menjadi angka murni
-        function parseCurrencyInput(value) {
-            if (!value || value.trim() === '') return 0;
-            
-            // Hapus semua titik dan ubah koma menjadi titik untuk parseFloat
-            const cleaned = value.replace(/\./g, '').replace(',', '.');
-            return parseFloat(cleaned) || 0;
-        }
+        // Optimasi untuk HP
+        optimizeForMobile();
         
-        // Check initial setup
-        function checkInitialSetup() {
-            const savedData = localStorage.getItem('cashflowData');
+        // Inisialisasi Ably
+        setTimeout(initializeAbly, 1500);
+    });
+    
+    // Variabel global
+    let transactions = [];
+    let nextId = 1;
+    let currentFilter = 'all';
+    let currentPaymentFilter = 'all';
+    let currentSort = 'date';
+    let initialCashBalance = 0;
+    let initialEwalletBalance = 0;
+    let isInitialBalanceSet = false;
+    
+    // ==================== ABLY REAL-TIME DATABASE ====================
+    const ABLY_API_KEY = 'MCZIZA.UBtc3g:k0y37USoNwpYAjfLXx37FxEvihZP0qlEZtRzmfEDh0c';
+    const CHANNEL_NAME = 'cashflow-app-v1';
+    
+    let ably = null;
+    let channel = null;
+    let presenceChannel = null;
+    let userId = 'user-' + Math.random().toString(36).substr(2, 9);
+    let userOnline = false;
+    let isSyncing = false;
+    
+    // Kategori dengan ikon
+    const categories = {
+        'gaji': { name: 'Gaji', icon: 'fas fa-money-bill-wave', color: '#4cc9f0' },
+        'investasi': { name: 'Investasi', icon: 'fas fa-chart-line', color: '#7209b7' },
+        'makanan': { name: 'Makanan', icon: 'fas fa-utensils', color: '#f8961e' },
+        'transportasi': { name: 'Transfer', icon: 'fas fa-car', color: '#4361ee' },
+        'hiburan': { name: 'Hiburan', icon: 'fas fa-film', color: '#f72585' },
+        'belanja': { name: 'Belanja', icon: 'fas fa-shopping-bag', color: '#3a0ca3' },
+        'kesehatan': { name: 'Kesehatan', icon: 'fas fa-heartbeat', color: '#2ecc71' },
+        'lainnya': { name: 'Lainnya', icon: 'fas fa-ellipsis-h', color: '#6c757d' }
+    };
+    
+    // ==================== FUNGSI ABLY ====================
+    
+    async function initializeAbly() {
+        try {
+            console.log('🔄 Menghubungkan ke server realtime...');
+            showNotification('🔄 Menghubungkan ke server realtime...', 'info');
             
-            if (savedData) {
-                const data = JSON.parse(savedData);
-                isInitialBalanceSet = data.isInitialBalanceSet || false;
-                initialCashBalance = data.initialCashBalance || 0;
-                initialEwalletBalance = data.initialEwalletBalance || 0;
-                
-                if (isInitialBalanceSet) {
-                    // Sembunyikan section saldo awal
-                    document.getElementById('initial-balance-section').classList.add('hidden');
-                    // Format saldo awal di input
-                    document.getElementById('initial-cash-balance').value = formatNumber(initialCashBalance);
-                    document.getElementById('initial-ewallet-balance').value = formatNumber(initialEwalletBalance);
-                    // Update dashboard
-                    updateDashboard();
-                    renderTransactions();
+            ably = new Ably.Realtime({
+                key: ABLY_API_KEY,
+                clientId: userId,
+                echoMessages: false
+            });
+            
+            // Setup event listeners untuk koneksi
+            ably.connection.on('connected', () => {
+                console.log('✅ Terhubung ke Ably');
+                userOnline = true;
+                showNotification('✅ Terhubung ke server realtime', 'success');
+                setupChannels();
+            });
+            
+            ably.connection.on('disconnected', () => {
+                console.warn('⚠️ Terputus dari Ably');
+                userOnline = false;
+                showNotification('⚠️ Mode offline aktif', 'warning');
+            });
+            
+            ably.connection.on('failed', (error) => {
+                console.error('❌ Koneksi Ably gagal:', error);
+                userOnline = false;
+            });
+            
+        } catch (error) {
+            console.error('❌ Error inisialisasi Ably:', error);
+            showNotification('❌ Gagal terhubung ke server realtime', 'error');
+        }
+    }
+    
+    function setupChannels() {
+        try {
+            // Channel utama untuk data
+            channel = ably.channels.get(CHANNEL_NAME);
+            
+            // Subscribe untuk berbagai event
+            channel.subscribe('transaction_add', (message) => {
+                if (message.clientId !== userId && !isSyncing) {
+                    handleRemoteTransactionAdd(message.data);
                 }
-            }
+            });
+            
+            channel.subscribe('transaction_delete', (message) => {
+                if (message.clientId !== userId) {
+                    handleRemoteTransactionDelete(message.data);
+                }
+            });
+            
+            channel.subscribe('balance_update', (message) => {
+                if (message.clientId !== userId) {
+                    handleRemoteBalanceUpdate(message.data);
+                }
+            });
+            
+            channel.subscribe('sync_request', (message) => {
+                if (message.clientId !== userId) {
+                    sendSyncData(message.clientId);
+                }
+            });
+            
+            channel.subscribe('sync_response', (message) => {
+                if (message.data.targetClientId === userId) {
+                    handleSyncData(message.data);
+                }
+            });
+            
+            // Channel untuk presence
+            presenceChannel = ably.channels.get(`${CHANNEL_NAME}-presence`);
+            
+            // Join presence channel
+            presenceChannel.presence.enter({
+                userId: userId,
+                name: `User${userId.slice(-4)}`,
+                timestamp: new Date().toISOString()
+            });
+            
+            // Listen untuk presence
+            presenceChannel.presence.subscribe('enter', (member) => {
+                console.log(`👤 ${member.data.name} online`);
+                showPresenceNotification(`${member.data.name} online`, '#4cc9f0');
+            });
+            
+            presenceChannel.presence.subscribe('leave', (member) => {
+                console.log(`👤 ${member.data.name} offline`);
+                showPresenceNotification(`${member.data.name} offline`, '#6c757d');
+            });
+            
+            // Minta sync data setelah 3 detik
+            setTimeout(requestSyncData, 3000);
+            
+        } catch (error) {
+            console.error('❌ Error setup channels:', error);
+        }
+    }
+    
+    // ==================== FUNGSI UNTUK MENGIRIM DATA KE SERVER ====================
+    
+    function sendTransactionToServer(transaction, action = 'add') {
+        if (!userOnline || !channel) {
+            console.log('📴 Mode offline - data disimpan lokal');
+            return;
         }
         
-        // Simpan saldo awal
-        function saveInitialBalance() {
-            const cashBalance = parseCurrencyInput(document.getElementById('initial-cash-balance').value);
-            const ewalletBalance = parseCurrencyInput(document.getElementById('initial-ewallet-balance').value);
+        channel.publish(`transaction_${action}`, {
+            ...transaction,
+            clientId: userId,
+            timestamp: new Date().toISOString()
+        });
+        
+        console.log(`📤 Transaksi ${action} dikirim ke server`);
+    }
+    
+    function sendBalanceToServer() {
+        if (!userOnline || !channel) return;
+        
+        const balanceData = {
+            initialCashBalance: initialCashBalance,
+            initialEwalletBalance: initialEwalletBalance,
+            isInitialBalanceSet: isInitialBalanceSet,
+            clientId: userId,
+            timestamp: new Date().toISOString()
+        };
+        
+        channel.publish('balance_update', balanceData);
+        console.log('📤 Saldo dikirim ke server');
+    }
+    
+    function requestSyncData() {
+        if (!userOnline || !channel) return;
+        
+        channel.publish('sync_request', {
+            clientId: userId,
+            timestamp: new Date().toISOString()
+        });
+        
+        console.log('🔄 Permintaan sync data dikirim');
+    }
+    
+    function sendSyncData(targetClientId) {
+        if (!userOnline || !channel) return;
+        
+        const syncData = {
+            transactions: transactions,
+            initialCashBalance: initialCashBalance,
+            initialEwalletBalance: initialEwalletBalance,
+            isInitialBalanceSet: isInitialBalanceSet,
+            nextId: nextId,
+            clientId: userId,
+            targetClientId: targetClientId,
+            timestamp: new Date().toISOString()
+        };
+        
+        channel.publish('sync_response', syncData);
+        console.log('📦 Data sync dikirim ke', targetClientId);
+    }
+    
+    // ==================== FUNGSI UNTUK MENERIMA DATA DARI SERVER ====================
+    
+    function handleRemoteTransactionAdd(transactionData) {
+        console.log('📥 Transaksi baru diterima dari server:', transactionData);
+        
+        // Cek apakah transaksi sudah ada
+        const existingIndex = transactions.findIndex(t => 
+            t.id === transactionData.id || 
+            (t.name === transactionData.name && 
+             t.amount === transactionData.amount && 
+             t.date === transactionData.date)
+        );
+        
+        if (existingIndex === -1) {
+            // Tambahkan transaksi baru
+            transactions.push(transactionData);
             
-            if (cashBalance < 0 || ewalletBalance < 0) {
-                showNotification('Saldo tidak boleh negatif', 'error');
-                return;
+            // Update nextId jika perlu
+            if (transactionData.id >= nextId) {
+                nextId = transactionData.id + 1;
             }
             
-            initialCashBalance = cashBalance;
-            initialEwalletBalance = ewalletBalance;
+            // Update UI
+            saveToLocalStorage();
+            updateDashboard();
+            renderTransactions();
+            
+            showNotification(`📥 Transaksi "${transactionData.name}" diterima`, 'info');
+        }
+    }
+    
+    function handleRemoteTransactionDelete(deleteData) {
+        console.log('🗑️ Hapus transaksi diterima dari server:', deleteData);
+        
+        // Hapus transaksi
+        transactions = transactions.filter(t => t.id !== deleteData.id);
+        
+        // Update UI
+        saveToLocalStorage();
+        updateDashboard();
+        renderTransactions();
+        
+        showNotification(`🗑️ Transaksi dihapus oleh pengguna lain`, 'info');
+    }
+    
+    function handleRemoteBalanceUpdate(balanceData) {
+        console.log('💰 Update saldo diterima dari server:', balanceData);
+        
+        // Update saldo
+        initialCashBalance = balanceData.initialCashBalance;
+        initialEwalletBalance = balanceData.initialEwalletBalance;
+        isInitialBalanceSet = balanceData.isInitialBalanceSet;
+        
+        // Update UI
+        document.getElementById('initial-cash-balance').value = formatNumber(initialCashBalance);
+        document.getElementById('initial-ewallet-balance').value = formatNumber(initialEwalletBalance);
+        
+        if (isInitialBalanceSet) {
+            document.getElementById('initial-balance-section').classList.add('hidden');
+        }
+        
+        updateDashboard();
+        saveToLocalStorage();
+        
+        showNotification(`💰 Saldo diperbarui oleh pengguna lain`, 'info');
+    }
+    
+    function handleSyncData(syncData) {
+        console.log('📦 Data sync diterima:', syncData);
+        
+        isSyncing = true;
+        
+        // Update data lokal dengan data dari server
+        if (syncData.transactions && syncData.transactions.length > 0) {
+            transactions = [...syncData.transactions];
+            nextId = syncData.nextId || nextId;
+        }
+        
+        if (syncData.isInitialBalanceSet) {
+            initialCashBalance = syncData.initialCashBalance;
+            initialEwalletBalance = syncData.initialEwalletBalance;
             isInitialBalanceSet = true;
             
-            // Sembunyikan section saldo awal
+            document.getElementById('initial-cash-balance').value = formatNumber(initialCashBalance);
+            document.getElementById('initial-ewallet-balance').value = formatNumber(initialEwalletBalance);
             document.getElementById('initial-balance-section').classList.add('hidden');
-            
-            // Update dashboard
-            updateDashboard();
-            
-            // Simpan ke localStorage
-            saveToLocalStorage();
-            
-            // Tampilkan notifikasi
-            showNotification(`Saldo awal berhasil disimpan: Tunai ${formatCurrency(cashBalance)}, E-Wallet ${formatCurrency(ewalletBalance)}`, 'success');
         }
         
-        // Simpan transaksi baru
-        function saveTransaction() {
-            // Validasi apakah saldo awal sudah diisi
-            if (!isInitialBalanceSet) {
-                showNotification('Harap isi saldo awal terlebih dahulu', 'error');
-                document.getElementById('initial-balance-section').scrollIntoView({ behavior: 'smooth' });
-                return;
+        // Update UI
+        saveToLocalStorage();
+        updateDashboard();
+        renderTransactions();
+        
+        isSyncing = false;
+        
+        showNotification(`🔄 Data disinkronisasi (${transactions.length} transaksi)`, 'success');
+    }
+    
+    function showPresenceNotification(message, color) {
+        if (window.innerWidth > 768) { // Hanya tampilkan di desktop
+            const notification = document.createElement('div');
+            notification.innerHTML = `<i class="fas fa-user"></i> ${message}`;
+            notification.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                background: ${color};
+                color: white;
+                border-radius: 10px;
+                font-weight: 600;
+                z-index: 9999;
+                animation: slideInUp 0.3s ease-out;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                max-width: 250px;
+                font-size: 0.9rem;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutDown 0.3s ease-out forwards';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+    }
+    
+    // ==================== FUNGSI UTAMA APLIKASI ====================
+    
+    // Setup event listeners
+    function setupEventListeners() {
+        // Pilih jenis transaksi
+        document.querySelectorAll('.type-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.type-option').forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        
+        // Pilih metode pembayaran
+        document.querySelectorAll('.method-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.method-option').forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        
+        // Pilih kategori
+        document.querySelectorAll('.category-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.category-option').forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        
+        // Simpan saldo awal
+        document.getElementById('save-initial-balance').addEventListener('click', saveInitialBalance);
+        
+        // Simpan transaksi
+        document.getElementById('save-transaction').addEventListener('click', saveTransaction);
+        
+        // Tombol filter transaksi
+        document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn[data-filter]').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentFilter = this.getAttribute('data-filter');
+                renderTransactions();
+            });
+        });
+        
+        // Tombol filter pembayaran
+        document.querySelectorAll('.filter-btn[data-payment]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn[data-payment]').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentPaymentFilter = this.getAttribute('data-payment');
+                renderTransactions();
+            });
+        });
+        
+        // Tombol tambah transaksi di header
+        document.getElementById('add-transaction-btn').addEventListener('click', function() {
+            document.getElementById('transaction-name').focus();
+        });
+        
+        // Tombol export data
+        document.getElementById('export-btn').addEventListener('click', showExportModal);
+        document.getElementById('close-export-modal').addEventListener('click', closeExportModal);
+        document.getElementById('cancel-export').addEventListener('click', closeExportModal);
+        document.getElementById('confirm-export').addEventListener('click', exportData);
+        
+        // Tombol hapus semua
+        document.getElementById('clear-all-btn').addEventListener('click', clearAllData);
+        
+        // Format otomatis untuk input jumlah
+        document.getElementById('initial-cash-balance').addEventListener('input', formatCurrencyInput);
+        document.getElementById('initial-ewallet-balance').addEventListener('input', formatCurrencyInput);
+        document.getElementById('transaction-amount').addEventListener('input', formatCurrencyInput);
+        
+        // Enter key untuk menyimpan transaksi
+        document.getElementById('transaction-name').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') document.getElementById('save-transaction').click();
+        });
+        
+        document.getElementById('transaction-amount').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') document.getElementById('save-transaction').click();
+        });
+        
+        // Enter key untuk saldo awal
+        document.getElementById('initial-cash-balance').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') document.getElementById('save-initial-balance').click();
+        });
+        
+        document.getElementById('initial-ewallet-balance').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') document.getElementById('save-initial-balance').click();
+        });
+    }
+    
+    // Optimasi untuk tampilan HP
+    function optimizeForMobile() {
+        // Sembunyikan action buttons di HP untuk ruang lebih
+        if (window.innerWidth <= 768) {
+            const transactionItems = document.querySelectorAll('.transaction-item');
+            transactionItems.forEach(item => {
+                const actions = item.querySelector('.transaction-actions');
+                if (actions) {
+                    actions.classList.add('mobile-hidden');
+                }
+            });
+        }
+    }
+    
+    // Fungsi untuk format input mata uang otomatis
+    function formatCurrencyInput(e) {
+        const input = e.target;
+        let value = input.value.replace(/[^\d,]/g, ''); // Hapus semua kecuali digit dan koma
+        
+        // Hapus semua titik yang ada (kita akan tambahkan kembali nanti)
+        value = value.replace(/\./g, '');
+        
+        // Pisahkan bagian integer dan decimal
+        let integerPart = value;
+        let decimalPart = '';
+        
+        // Jika ada koma, pisahkan bagian decimal
+        if (value.includes(',')) {
+            const parts = value.split(',');
+            integerPart = parts[0];
+            decimalPart = parts[1] ? ',' + parts[1].substring(0, 2) : ''; // Maksimal 2 digit decimal
+        }
+        
+        // Format integer part dengan titik setiap 3 digit
+        if (integerPart.length > 0) {
+            integerPart = parseInt(integerPart, 10).toLocaleString('id-ID');
+        }
+        
+        // Gabungkan kembali
+        input.value = integerPart + decimalPart;
+    }
+    
+    // Fungsi untuk mengubah format mata uang menjadi angka murni
+    function parseCurrencyInput(value) {
+        if (!value || value.trim() === '') return 0;
+        
+        // Hapus semua titik dan ubah koma menjadi titik untuk parseFloat
+        const cleaned = value.replace(/\./g, '').replace(',', '.');
+        return parseFloat(cleaned) || 0;
+    }
+    
+    // Check initial setup
+    function checkInitialSetup() {
+        const savedData = localStorage.getItem('cashflowData');
+        
+        if (savedData) {
+            const data = JSON.parse(savedData);
+            isInitialBalanceSet = data.isInitialBalanceSet || false;
+            initialCashBalance = data.initialCashBalance || 0;
+            initialEwalletBalance = data.initialEwalletBalance || 0;
+            
+            if (isInitialBalanceSet) {
+                // Sembunyikan section saldo awal
+                document.getElementById('initial-balance-section').classList.add('hidden');
+                // Format saldo awal di input
+                document.getElementById('initial-cash-balance').value = formatNumber(initialCashBalance);
+                document.getElementById('initial-ewallet-balance').value = formatNumber(initialEwalletBalance);
+                // Update dashboard
+                updateDashboard();
+                renderTransactions();
             }
-            
-            // Validasi input
-            const name = document.getElementById('transaction-name').value.trim();
-            const amount = parseCurrencyInput(document.getElementById('transaction-amount').value);
-            const date = document.getElementById('transaction-date').value;
-            const note = document.getElementById('transaction-note').value.trim();
-            
-            if (!name) {
-                showNotification('Masukkan nama transaksi', 'error');
-                document.getElementById('transaction-name').focus();
+        }
+    }
+    
+    // Simpan saldo awal
+    function saveInitialBalance() {
+        const cashBalance = parseCurrencyInput(document.getElementById('initial-cash-balance').value);
+        const ewalletBalance = parseCurrencyInput(document.getElementById('initial-ewallet-balance').value);
+        
+        if (cashBalance < 0 || ewalletBalance < 0) {
+            showNotification('Saldo tidak boleh negatif', 'error');
+            return;
+        }
+        
+        initialCashBalance = cashBalance;
+        initialEwalletBalance = ewalletBalance;
+        isInitialBalanceSet = true;
+        
+        // Sembunyikan section saldo awal
+        document.getElementById('initial-balance-section').classList.add('hidden');
+        
+        // Update dashboard
+        updateDashboard();
+        
+        // Simpan ke localStorage
+        saveToLocalStorage();
+        
+        // Kirim ke server
+        sendBalanceToServer();
+        
+        // Tampilkan notifikasi
+        showNotification(`Saldo awal berhasil disimpan: Tunai ${formatCurrency(cashBalance)}, E-Wallet ${formatCurrency(ewalletBalance)}`, 'success');
+    }
+    
+    // Simpan transaksi baru
+    function saveTransaction() {
+        // Validasi apakah saldo awal sudah diisi
+        if (!isInitialBalanceSet) {
+            showNotification('Harap isi saldo awal terlebih dahulu', 'error');
+            document.getElementById('initial-balance-section').scrollIntoView({ behavior: 'smooth' });
+            return;
+        }
+        
+        // Validasi input
+        const name = document.getElementById('transaction-name').value.trim();
+        const amount = parseCurrencyInput(document.getElementById('transaction-amount').value);
+        const date = document.getElementById('transaction-date').value;
+        const note = document.getElementById('transaction-note').value.trim();
+        
+        if (!name) {
+            showNotification('Masukkan nama transaksi', 'error');
+            document.getElementById('transaction-name').focus();
+            return;
+        }
+        
+        if (!amount || amount <= 0) {
+            showNotification('Masukkan jumlah yang valid', 'error');
+            document.getElementById('transaction-amount').focus();
+            return;
+        }
+        
+        if (!date) {
+            showNotification('Pilih tanggal transaksi', 'error');
+            document.getElementById('transaction-date').focus();
                 return;
-            }
+        }
+        
+        // Ambil jenis transaksi yang dipilih
+        const type = document.querySelector('.type-option.active').getAttribute('data-type');
+        
+        // Ambil metode pembayaran yang dipilih
+        const paymentMethod = document.querySelector('.method-option.active').getAttribute('data-method');
+        
+        // Ambil kategori yang dipilih
+        const category = document.querySelector('.category-option.active').getAttribute('data-category');
+        
+        // Buat objek transaksi
+        const transaction = {
+            id: nextId++,
+            type: type,
+            paymentMethod: paymentMethod,
+            name: name,
+            amount: amount,
+            category: category,
+            date: date,
+            note: note || '',
+            createdAt: new Date().toISOString()
+        };
+        
+        // Tambahkan ke array lokal
+        transactions.push(transaction);
+        
+        // Simpan ke localStorage
+        saveToLocalStorage();
+        
+        // Update UI
+        updateDashboard();
+        renderTransactions();
+        
+        // Kirim ke server
+        sendTransactionToServer(transaction, 'add');
+        
+        // Reset form
+        document.getElementById('transaction-name').value = '';
+        document.getElementById('transaction-amount').value = '';
+        document.getElementById('transaction-note').value = '';
+        document.getElementById('transaction-name').focus();
+        
+        // Tampilkan notifikasi
+        showNotification(`Transaksi "${name}" berhasil dicatat`, 'success');
+    }
+    
+    // Hapus transaksi
+    function deleteTransaction(id) {
+        if (confirm('Apakah Anda yakin ingin menghapus transaksi ini?')) {
+            // Cari transaksi yang akan dihapus
+            const transactionToDelete = transactions.find(t => t.id === id);
             
-            if (!amount || amount <= 0) {
-                showNotification('Masukkan jumlah yang valid', 'error');
-                document.getElementById('transaction-amount').focus();
-                return;
-            }
-            
-            if (!date) {
-                showNotification('Pilih tanggal transaksi', 'error');
-                document.getElementById('transaction-date').focus();
-                return;
-            }
-            
-            // Ambil jenis transaksi yang dipilih
-            const type = document.querySelector('.type-option.active').getAttribute('data-type');
-            
-            // Ambil metode pembayaran yang dipilih
-            const paymentMethod = document.querySelector('.method-option.active').getAttribute('data-method');
-            
-            // Ambil kategori yang dipilih
-            const category = document.querySelector('.category-option.active').getAttribute('data-category');
-            
-            // Buat objek transaksi
-            const transaction = {
-                id: nextId++,
-                type: type,
-                paymentMethod: paymentMethod,
-                name: name,
-                amount: amount,
-                category: category,
-                date: date,
-                note: note || '',
-                createdAt: new Date().toISOString()
-            };
-            
-            // Tambahkan ke array
-            transactions.push(transaction);
+            // Hapus dari array lokal
+            transactions = transactions.filter(transaction => transaction.id !== id);
             
             // Simpan ke localStorage
             saveToLocalStorage();
@@ -1819,487 +2159,485 @@
             updateDashboard();
             renderTransactions();
             
-            // Reset form
-            document.getElementById('transaction-name').value = '';
-            document.getElementById('transaction-amount').value = '';
-            document.getElementById('transaction-note').value = '';
-            document.getElementById('transaction-name').focus();
+            // Kirim ke server
+            if (transactionToDelete) {
+                sendTransactionToServer({ id: id }, 'delete');
+            }
             
-            // Tampilkan notifikasi
-            showNotification(`Transaksi "${name}" berhasil dicatat`, 'success');
+            showNotification('Transaksi berhasil dihapus', 'success');
+        }
+    }
+    
+    // Hapus semua data
+    function clearAllData() {
+        if (confirm('Apakah Anda yakin ingin menghapus SEMUA data? Ini akan menghapus semua transaksi dan mengembalikan ke saldo awal.')) {
+            transactions = [];
+            nextId = 1;
+            saveToLocalStorage();
+            updateDashboard();
+            renderTransactions();
+            showNotification('Semua transaksi telah dihapus', 'success');
+        }
+    }
+    
+    // Render daftar transaksi
+    function renderTransactions() {
+        const container = document.getElementById('transactions-list');
+        
+        // Filter transaksi
+        let filteredTransactions = [...transactions];
+        
+        // Filter berdasarkan jenis transaksi
+        if (currentFilter !== 'all') {
+            filteredTransactions = filteredTransactions.filter(t => t.type === currentFilter);
         }
         
-        // Hapus transaksi
-        function deleteTransaction(id) {
-            if (confirm('Apakah Anda yakin ingin menghapus transaksi ini?')) {
-                transactions = transactions.filter(transaction => transaction.id !== id);
-                saveToLocalStorage();
-                updateDashboard();
-                renderTransactions();
-                showNotification('Transaksi berhasil dihapus', 'success');
-            }
+        // Filter berdasarkan metode pembayaran
+        if (currentPaymentFilter !== 'all') {
+            filteredTransactions = filteredTransactions.filter(t => t.paymentMethod === currentPaymentFilter);
         }
         
-        // Hapus semua data
-        function clearAllData() {
-            if (confirm('Apakah Anda yakin ingin menghapus SEMUA data? Ini akan menghapus semua transaksi dan mengembalikan ke saldo awal.')) {
-                transactions = [];
-                nextId = 1;
-                saveToLocalStorage();
-                updateDashboard();
-                renderTransactions();
-                showNotification('Semua transaksi telah dihapus', 'success');
-            }
+        // Sort transaksi
+        if (currentSort === 'date') {
+            filteredTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+        } else if (currentSort === 'amount') {
+            filteredTransactions.sort((a, b) => b.amount - a.amount);
         }
         
-        // Render daftar transaksi
-        function renderTransactions() {
-            const container = document.getElementById('transactions-list');
-            
-            // Filter transaksi
-            let filteredTransactions = [...transactions];
-            
-            // Filter berdasarkan jenis transaksi
-            if (currentFilter !== 'all') {
-                filteredTransactions = filteredTransactions.filter(t => t.type === currentFilter);
-            }
-            
-            // Filter berdasarkan metode pembayaran
-            if (currentPaymentFilter !== 'all') {
-                filteredTransactions = filteredTransactions.filter(t => t.paymentMethod === currentPaymentFilter);
-            }
-            
-            // Sort transaksi
-            if (currentSort === 'date') {
-                filteredTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
-            } else if (currentSort === 'amount') {
-                filteredTransactions.sort((a, b) => b.amount - a.amount);
-            }
-            
-            // Jika tidak ada transaksi
-            if (filteredTransactions.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">
-                            <i class="fas fa-receipt"></i>
-                        </div>
-                        <div class="empty-title">${transactions.length === 0 ? 'Belum ada transaksi' : 'Tidak ada transaksi yang sesuai'}</div>
-                        <div class="empty-text">${transactions.length === 0 ? 'Mulai dengan mencatat transaksi pertama Anda' : 'Coba ubah filter yang Anda gunakan'}</div>
+        // Jika tidak ada transaksi
+        if (filteredTransactions.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-receipt"></i>
                     </div>
-                `;
-                return;
-            }
-            
-            // Render transaksi
-            let html = '';
-            
-            filteredTransactions.forEach(transaction => {
-                const category = categories[transaction.category];
-                const formattedAmount = formatCurrency(transaction.amount);
-                const formattedDate = formatDate(transaction.date);
-                
-                html += `
-                    <div class="transaction-item transaction-${transaction.type}">
-                        <div class="transaction-icon">
-                            <i class="${category.icon}"></i>
-                        </div>
-                        <div class="transaction-details">
-                            <div class="transaction-name">${transaction.name}</div>
-                            <div class="transaction-meta">
-                                <span class="transaction-category">${category.name}</span>
-                                <span class="transaction-payment ${transaction.paymentMethod}">
-                                    <i class="fas ${transaction.paymentMethod === 'cash' ? 'fa-money-bill-wave' : 'fa-mobile-alt'}"></i>
-                                    ${transaction.paymentMethod === 'cash' ? 'Tunai' : 'E-Wallet'}
-                                </span>
-                                <span class="transaction-date">${formattedDate}</span>
-                                ${transaction.note ? `<span><i class="fas fa-sticky-note"></i> ${transaction.note}</span>` : ''}
-                            </div>
-                        </div>
-                        <div class="transaction-amount">
-                            ${transaction.type === 'income' ? '+' : '-'} ${formattedAmount}
-                        </div>
-                        <div class="transaction-actions">
-                            <button class="action-btn delete" onclick="deleteTransaction(${transaction.id})">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            container.innerHTML = html;
-            
-            // Optimasi untuk HP setelah render
-            optimizeForMobile();
-        }
-        
-        // Update dashboard dengan perhitungan tunai dan e-wallet
-        function updateDashboard() {
-            // Hitung total pemasukan dan pengeluaran
-            let totalIncome = 0;
-            let totalExpense = 0;
-            let cashIncome = 0;
-            let cashExpense = 0;
-            let ewalletIncome = 0;
-            let ewalletExpense = 0;
-            
-            transactions.forEach(transaction => {
-                if (transaction.type === 'income') {
-                    totalIncome += transaction.amount;
-                    if (transaction.paymentMethod === 'cash') {
-                        cashIncome += transaction.amount;
-                    } else {
-                        ewalletIncome += transaction.amount;
-                    }
-                } else {
-                    totalExpense += transaction.amount;
-                    if (transaction.paymentMethod === 'cash') {
-                        cashExpense += transaction.amount;
-                    } else {
-                        ewalletExpense += transaction.amount;
-                    }
-                }
-            });
-            
-            // Hitung saldo saat ini
-            const currentCashBalance = initialCashBalance + cashIncome - cashExpense;
-            const currentEwalletBalance = initialEwalletBalance + ewalletIncome - ewalletExpense;
-            const totalBalance = currentCashBalance + currentEwalletBalance;
-            
-            // Update elemen dashboard
-            document.getElementById('total-income').textContent = formatCurrency(totalIncome);
-            document.getElementById('total-expense').textContent = formatCurrency(totalExpense);
-            document.getElementById('cash-balance').textContent = formatCurrency(currentCashBalance);
-            document.getElementById('ewallet-balance').textContent = formatCurrency(currentEwalletBalance);
-            document.getElementById('total-balance').textContent = formatCurrency(totalBalance);
-            
-            // Update warna saldo jika negatif
-            const cashBalanceElement = document.getElementById('cash-balance');
-            const ewalletBalanceElement = document.getElementById('ewallet-balance');
-            const totalBalanceElement = document.getElementById('total-balance');
-            
-            if (currentCashBalance < 0) {
-                cashBalanceElement.style.color = '#f72585';
-            } else {
-                cashBalanceElement.style.color = 'var(--dark)';
-            }
-            
-            if (currentEwalletBalance < 0) {
-                ewalletBalanceElement.style.color = '#f72585';
-            } else {
-                ewalletBalanceElement.style.color = 'var(--dark)';
-            }
-            
-            if (totalBalance < 0) {
-                totalBalanceElement.style.color = '#f72585';
-            } else {
-                totalBalanceElement.style.color = 'var(--dark)';
-            }
-        }
-        
-        // Format mata uang dengan tanda titik dan koma
-        function formatCurrency(amount) {
-            return new Intl.NumberFormat('id-ID', {
-                style: 'currency',
-                currency: 'IDR',
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 2
-            }).format(amount);
-        }
-        
-        // Format angka dengan titik (tanpa simbol Rp)
-        function formatNumber(amount) {
-            return new Intl.NumberFormat('id-ID', {
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 2
-            }).format(amount);
-        }
-        
-        // Export data ke Excel
-        function exportData() {
-            if (transactions.length === 0) {
-                showNotification('Tidak ada data transaksi untuk diexport', 'error');
-                return;
-            }
-            
-            const format = document.querySelector('.export-option.active').dataset.format;
-            
-            if (format === 'excel') {
-                exportToExcel();
-            } else if (format === 'json') {
-                exportToJSON();
-            }
-            
-            closeExportModal();
-        }
-        
-        // Export ke Excel
-        function exportToExcel() {
-            // Hitung total
-            let totalIncome = 0;
-            let totalExpense = 0;
-            let cashIncome = 0;
-            let cashExpense = 0;
-            let ewalletIncome = 0;
-            let ewalletExpense = 0;
-            
-            transactions.forEach(transaction => {
-                if (transaction.type === 'income') {
-                    totalIncome += transaction.amount;
-                    if (transaction.paymentMethod === 'cash') {
-                        cashIncome += transaction.amount;
-                    } else {
-                        ewalletIncome += transaction.amount;
-                    }
-                } else {
-                    totalExpense += transaction.amount;
-                    if (transaction.paymentMethod === 'cash') {
-                        cashExpense += transaction.amount;
-                    } else {
-                        ewalletExpense += transaction.amount;
-                    }
-                }
-            });
-            
-            const currentCashBalance = initialCashBalance + cashIncome - cashExpense;
-            const currentEwalletBalance = initialEwalletBalance + ewalletIncome - ewalletExpense;
-            const totalBalance = currentCashBalance + currentEwalletBalance;
-            
-            // Buat data untuk sheet Summary
-            const summaryData = [
-                ['LAPORAN KEUANGAN - CASHFLOW PRO'],
-                ['Periode:', 'Semua Data'],
-                ['Tanggal Export:', new Date().toLocaleDateString('id-ID')],
-                [''],
-                ['INFORMASI SALDO AWAL'],
-                ['Saldo Tunai Awal:', formatCurrency(initialCashBalance)],
-                ['Saldo E-Wallet Awal:', formatCurrency(initialEwalletBalance)],
-                ['Total Saldo Awal:', formatCurrency(initialCashBalance + initialEwalletBalance)],
-                [''],
-                ['RINGKASAN TRANSAKSI'],
-                ['Total Pemasukan:', formatCurrency(totalIncome)],
-                ['Total Pengeluaran:', formatCurrency(totalExpense)],
-                [''],
-                ['SALDO SAAT INI'],
-                ['Saldo Tunai:', formatCurrency(currentCashBalance)],
-                ['Saldo E-Wallet:', formatCurrency(currentEwalletBalance)],
-                ['Total Saldo:', formatCurrency(totalBalance)],
-                [''],
-                ['JUMLAH TRANSAKSI:', transactions.length]
-            ];
-            
-            // Buat data untuk sheet Transaksi
-            const transactionsData = [
-                ['No', 'Tanggal', 'Jenis', 'Metode', 'Nama Transaksi', 'Kategori', 'Jumlah', 'Catatan']
-            ];
-            
-            // Urutkan berdasarkan tanggal
-            const sortedTransactions = [...transactions].sort((a, b) => new Date(a.date) - new Date(b.date));
-            
-            sortedTransactions.forEach((transaction, index) => {
-                const type = transaction.type === 'income' ? 'Pemasukan' : 'Pengeluaran';
-                const paymentMethod = transaction.paymentMethod === 'cash' ? 'Tunai' : 'E-Wallet';
-                const category = categories[transaction.category].name;
-                
-                transactionsData.push([
-                    index + 1,
-                    formatDateForExport(transaction.date),
-                    type,
-                    paymentMethod,
-                    transaction.name,
-                    category,
-                    transaction.amount,
-                    transaction.note || '-'
-                ]);
-            });
-            
-            // Buat workbook dengan dua sheet
-            const wb = XLSX.utils.book_new();
-            
-            // Sheet Summary
-            const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
-            XLSX.utils.book_append_sheet(wb, wsSummary, 'Summary');
-            
-            // Sheet Transaksi
-            const wsTransactions = XLSX.utils.aoa_to_sheet(transactionsData);
-            XLSX.utils.book_append_sheet(wb, wsTransactions, 'Transaksi');
-            
-            // Buat nama file
-            const fileName = `cashflow_pro_report_${new Date().toISOString().slice(0, 10)}.xlsx`;
-            
-            // Export ke file Excel
-            XLSX.writeFile(wb, fileName);
-            
-            showNotification(`Data berhasil diexport ke Excel (${transactions.length} transaksi)`, 'success');
-        }
-        
-        // Export ke JSON
-        function exportToJSON() {
-            const exportData = {
-                metadata: {
-                    exportDate: new Date().toISOString(),
-                    appName: 'Cashflow Pro',
-                    appVersion: '2.0'
-                },
-                initialCashBalance: initialCashBalance,
-                initialEwalletBalance: initialEwalletBalance,
-                isInitialBalanceSet: isInitialBalanceSet,
-                transactionCount: transactions.length,
-                transactions: transactions
-            };
-            
-            const jsonString = JSON.stringify(exportData, null, 2);
-            const fileName = `cashflow_pro_backup_${new Date().toISOString().slice(0, 10)}.json`;
-            
-            // Download file
-            downloadFile(jsonString, fileName, 'application/json');
-            
-            showNotification(`Backup JSON berhasil dibuat`, 'success');
-        }
-        
-        // Modal functions
-        function showExportModal() {
-            document.getElementById('export-modal').classList.add('active');
-        }
-        
-        function closeExportModal() {
-            document.getElementById('export-modal').classList.remove('active');
-        }
-        
-        // Format tanggal
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('id-ID', {
-                day: 'numeric',
-                month: 'short',
-                year: 'numeric'
-            });
-        }
-        
-        // Format tanggal untuk export
-        function formatDateForExport(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('id-ID', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric'
-            });
-        }
-        
-        // Download file helper
-        function downloadFile(content, fileName, mimeType) {
-            const blob = new Blob([content], { type: mimeType });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = fileName;
-            link.style.display = 'none';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-        }
-        
-        // Tampilkan notifikasi
-        function showNotification(message, type) {
-            // Buat elemen notifikasi
-            const notification = document.createElement('div');
-            notification.textContent = message;
-            notification.style.cssText = `
-                position: fixed;
-                top: 30px;
-                right: 30px;
-                padding: 18px 25px;
-                border-radius: 12px;
-                color: white;
-                font-weight: 600;
-                z-index: 9999;
-                animation: slideInRight 0.3s ease-out;
-                box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-                display: flex;
-                align-items: center;
-                gap: 12px;
-                max-width: 400px;
+                    <div class="empty-title">${transactions.length === 0 ? 'Belum ada transaksi' : 'Tidak ada transaksi yang sesuai'}</div>
+                    <div class="empty-text">${transactions.length === 0 ? 'Mulai dengan mencatat transaksi pertama Anda' : 'Coba ubah filter yang Anda gunakan'}</div>
+                </div>
             `;
+            return;
+        }
+        
+        // Render transaksi
+        let html = '';
+        
+        filteredTransactions.forEach(transaction => {
+            const category = categories[transaction.category];
+            const formattedAmount = formatCurrency(transaction.amount);
+            const formattedDate = formatDate(transaction.date);
             
-            // Set warna berdasarkan jenis notifikasi
-            if (type === 'success') {
-                notification.style.background = 'var(--gradient-success)';
-                notification.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
-            } else if (type === 'error') {
-                notification.style.background = 'var(--gradient-danger)';
-                notification.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+            html += `
+                <div class="transaction-item transaction-${transaction.type}">
+                    <div class="transaction-icon">
+                        <i class="${category.icon}"></i>
+                    </div>
+                    <div class="transaction-details">
+                        <div class="transaction-name">${transaction.name}</div>
+                        <div class="transaction-meta">
+                            <span class="transaction-category">${category.name}</span>
+                            <span class="transaction-payment ${transaction.paymentMethod}">
+                                <i class="fas ${transaction.paymentMethod === 'cash' ? 'fa-money-bill-wave' : 'fa-mobile-alt'}"></i>
+                                ${transaction.paymentMethod === 'cash' ? 'Tunai' : 'E-Wallet'}
+                            </span>
+                            <span class="transaction-date">${formattedDate}</span>
+                            ${transaction.note ? `<span><i class="fas fa-sticky-note"></i> ${transaction.note}</span>` : ''}
+                        </div>
+                    </div>
+                    <div class="transaction-amount">
+                        ${transaction.type === 'income' ? '+' : '-'} ${formattedAmount}
+                    </div>
+                    <div class="transaction-actions">
+                        <button class="action-btn delete" onclick="deleteTransaction(${transaction.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+        
+        container.innerHTML = html;
+        
+        // Optimasi untuk HP setelah render
+        optimizeForMobile();
+    }
+    
+    // Update dashboard dengan perhitungan tunai dan e-wallet
+    function updateDashboard() {
+        // Hitung total pemasukan dan pengeluaran
+        let totalIncome = 0;
+        let totalExpense = 0;
+        let cashIncome = 0;
+        let cashExpense = 0;
+        let ewalletIncome = 0;
+        let ewalletExpense = 0;
+        
+        transactions.forEach(transaction => {
+            if (transaction.type === 'income') {
+                totalIncome += transaction.amount;
+                if (transaction.paymentMethod === 'cash') {
+                    cashIncome += transaction.amount;
+                } else {
+                    ewalletIncome += transaction.amount;
+                }
             } else {
-                notification.style.background = 'var(--gradient-primary)';
-                notification.innerHTML = `<i class="fas fa-info-circle"></i> ${message}`;
+                totalExpense += transaction.amount;
+                if (transaction.paymentMethod === 'cash') {
+                    cashExpense += transaction.amount;
+                } else {
+                    ewalletExpense += transaction.amount;
+                }
             }
-            
-            // Responsif untuk HP
-            if (window.innerWidth <= 768) {
-                notification.style.top = '20px';
-                notification.style.right = '20px';
-                notification.style.left = '20px';
-                notification.style.maxWidth = 'calc(100% - 40px)';
+        });
+        
+        // Hitung saldo saat ini
+        const currentCashBalance = initialCashBalance + cashIncome - cashExpense;
+        const currentEwalletBalance = initialEwalletBalance + ewalletIncome - ewalletExpense;
+        const totalBalance = currentCashBalance + currentEwalletBalance;
+        
+        // Update elemen dashboard
+        document.getElementById('total-income').textContent = formatCurrency(totalIncome);
+        document.getElementById('total-expense').textContent = formatCurrency(totalExpense);
+        document.getElementById('cash-balance').textContent = formatCurrency(currentCashBalance);
+        document.getElementById('ewallet-balance').textContent = formatCurrency(currentEwalletBalance);
+        document.getElementById('total-balance').textContent = formatCurrency(totalBalance);
+        
+        // Update warna saldo jika negatif
+        const cashBalanceElement = document.getElementById('cash-balance');
+        const ewalletBalanceElement = document.getElementById('ewallet-balance');
+        const totalBalanceElement = document.getElementById('total-balance');
+        
+        if (currentCashBalance < 0) {
+            cashBalanceElement.style.color = '#f72585';
+        } else {
+            cashBalanceElement.style.color = 'var(--dark)';
+        }
+        
+        if (currentEwalletBalance < 0) {
+            ewalletBalanceElement.style.color = '#f72585';
+        } else {
+            ewalletBalanceElement.style.color = 'var(--dark)';
+        }
+        
+        if (totalBalance < 0) {
+            totalBalanceElement.style.color = '#f72585';
+        } else {
+            totalBalanceElement.style.color = 'var(--dark)';
+        }
+    }
+    
+    // Format mata uang dengan tanda titik dan koma
+    function formatCurrency(amount) {
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2
+        }).format(amount);
+    }
+    
+    // Format angka dengan titik (tanpa simbol Rp)
+    function formatNumber(amount) {
+        return new Intl.NumberFormat('id-ID', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2
+        }).format(amount);
+    }
+    
+    // Export data ke Excel
+    function exportData() {
+        if (transactions.length === 0) {
+            showNotification('Tidak ada data transaksi untuk diexport', 'error');
+            return;
+        }
+        
+        const format = document.querySelector('.export-option.active').dataset.format;
+        
+        if (format === 'excel') {
+            exportToExcel();
+        } else if (format === 'json') {
+            exportToJSON();
+        }
+        
+        closeExportModal();
+    }
+    
+    // Export ke Excel
+    function exportToExcel() {
+        // Hitung total
+        let totalIncome = 0;
+        let totalExpense = 0;
+        let cashIncome = 0;
+        let cashExpense = 0;
+        let ewalletIncome = 0;
+        let ewalletExpense = 0;
+        
+        transactions.forEach(transaction => {
+            if (transaction.type === 'income') {
+                totalIncome += transaction.amount;
+                if (transaction.paymentMethod === 'cash') {
+                    cashIncome += transaction.amount;
+                } else {
+                    ewalletIncome += transaction.amount;
+                }
+            } else {
+                totalExpense += transaction.amount;
+                if (transaction.paymentMethod === 'cash') {
+                    cashExpense += transaction.amount;
+                } else {
+                    ewalletExpense += transaction.amount;
+                }
             }
+        });
+        
+        const currentCashBalance = initialCashBalance + cashIncome - cashExpense;
+        const currentEwalletBalance = initialEwalletBalance + ewalletIncome - ewalletExpense;
+        const totalBalance = currentCashBalance + currentEwalletBalance;
+        
+        // Buat data untuk sheet Summary
+        const summaryData = [
+            ['LAPORAN KEUANGAN - CASHFLOW PRO'],
+            ['Periode:', 'Semua Data'],
+            ['Tanggal Export:', new Date().toLocaleDateString('id-ID')],
+            [''],
+            ['INFORMASI SALDO AWAL'],
+            ['Saldo Tunai Awal:', formatCurrency(initialCashBalance)],
+            ['Saldo E-Wallet Awal:', formatCurrency(initialEwalletBalance)],
+            ['Total Saldo Awal:', formatCurrency(initialCashBalance + initialEwalletBalance)],
+            [''],
+            ['RINGKASAN TRANSAKSI'],
+            ['Total Pemasukan:', formatCurrency(totalIncome)],
+            ['Total Pengeluaran:', formatCurrency(totalExpense)],
+            [''],
+            ['SALDO SAAT INI'],
+            ['Saldo Tunai:', formatCurrency(currentCashBalance)],
+            ['Saldo E-Wallet:', formatCurrency(currentEwalletBalance)],
+            ['Total Saldo:', formatCurrency(totalBalance)],
+            [''],
+            ['JUMLAH TRANSAKSI:', transactions.length]
+        ];
+        
+        // Buat data untuk sheet Transaksi
+        const transactionsData = [
+            ['No', 'Tanggal', 'Jenis', 'Metode', 'Nama Transaksi', 'Kategori', 'Jumlah', 'Catatan']
+        ];
+        
+        // Urutkan berdasarkan tanggal
+        const sortedTransactions = [...transactions].sort((a, b) => new Date(a.date) - new Date(b.date));
+        
+        sortedTransactions.forEach((transaction, index) => {
+            const type = transaction.type === 'income' ? 'Pemasukan' : 'Pengeluaran';
+            const paymentMethod = transaction.paymentMethod === 'cash' ? 'Tunai' : 'E-Wallet';
+            const category = categories[transaction.category].name;
             
-            // Tambahkan ke body
-            document.body.appendChild(notification);
-            
-            // Hapus notifikasi setelah 3 detik
+            transactionsData.push([
+                index + 1,
+                formatDateForExport(transaction.date),
+                type,
+                paymentMethod,
+                transaction.name,
+                category,
+                transaction.amount,
+                transaction.note || '-'
+            ]);
+        });
+        
+        // Buat workbook dengan dua sheet
+        const wb = XLSX.utils.book_new();
+        
+        // Sheet Summary
+        const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
+        XLSX.utils.book_append_sheet(wb, wsSummary, 'Summary');
+        
+        // Sheet Transaksi
+        const wsTransactions = XLSX.utils.aoa_to_sheet(transactionsData);
+        XLSX.utils.book_append_sheet(wb, wsTransactions, 'Transaksi');
+        
+        // Buat nama file
+        const fileName = `cashflow_pro_report_${new Date().toISOString().slice(0, 10)}.xlsx`;
+        
+        // Export ke file Excel
+        XLSX.writeFile(wb, fileName);
+        
+        showNotification(`Data berhasil diexport ke Excel (${transactions.length} transaksi)`, 'success');
+    }
+    
+    // Export ke JSON
+    function exportToJSON() {
+        const exportData = {
+            metadata: {
+                exportDate: new Date().toISOString(),
+                appName: 'Cashflow Pro',
+                appVersion: '2.0'
+            },
+            initialCashBalance: initialCashBalance,
+            initialEwalletBalance: initialEwalletBalance,
+            isInitialBalanceSet: isInitialBalanceSet,
+            transactionCount: transactions.length,
+            transactions: transactions
+        };
+        
+        const jsonString = JSON.stringify(exportData, null, 2);
+        const fileName = `cashflow_pro_backup_${new Date().toISOString().slice(0, 10)}.json`;
+        
+        // Download file
+        downloadFile(jsonString, fileName, 'application/json');
+        
+        showNotification(`Backup JSON berhasil dibuat`, 'success');
+    }
+    
+    // Modal functions
+    function showExportModal() {
+        document.getElementById('export-modal').classList.add('active');
+    }
+    
+    function closeExportModal() {
+        document.getElementById('export-modal').classList.remove('active');
+    }
+    
+    // Format tanggal
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('id-ID', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric'
+        });
+    }
+    
+    // Format tanggal untuk export
+    function formatDateForExport(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('id-ID', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+    }
+    
+    // Download file helper
+    function downloadFile(content, fileName, mimeType) {
+        const blob = new Blob([content], { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName;
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
+    
+    // Tampilkan notifikasi
+    function showNotification(message, type) {
+        // Buat elemen notifikasi
+        const notification = document.createElement('div');
+        notification.textContent = message;
+        notification.style.cssText = `
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            padding: 18px 25px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            z-index: 9999;
+            animation: slideInRight 0.3s ease-out;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            max-width: 400px;
+        `;
+        
+        // Set warna berdasarkan jenis notifikasi
+        if (type === 'success') {
+            notification.style.background = 'var(--gradient-success)';
+            notification.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+        } else if (type === 'error') {
+            notification.style.background = 'var(--gradient-danger)';
+            notification.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+        } else {
+            notification.style.background = 'var(--gradient-primary)';
+            notification.innerHTML = `<i class="fas fa-info-circle"></i> ${message}`;
+        }
+        
+        // Responsif untuk HP
+        if (window.innerWidth <= 768) {
+            notification.style.top = '20px';
+            notification.style.right = '20px';
+            notification.style.left = '20px';
+            notification.style.maxWidth = 'calc(100% - 40px)';
+        }
+        
+        // Tambahkan ke body
+        document.body.appendChild(notification);
+        
+        // Hapus notifikasi setelah 3 detik
+        setTimeout(() => {
+            notification.style.animation = 'slideOutRight 0.3s ease-out forwards';
             setTimeout(() => {
-                notification.style.animation = 'slideOutRight 0.3s ease-out forwards';
-                setTimeout(() => {
-                    if (notification.parentNode) {
-                        document.body.removeChild(notification);
-                    }
-                }, 300);
-            }, 3000);
-            
-            // Tambahkan animasi CSS jika belum ada
-            if (!document.getElementById('notification-styles')) {
-                const style = document.createElement('style');
-                style.id = 'notification-styles';
-                style.textContent = `
-                    @keyframes slideInRight {
-                        from { transform: translateX(100%); opacity: 0; }
-                        to { transform: translateX(0); opacity: 1; }
-                    }
-                    
-                    @keyframes slideOutRight {
-                        from { transform: translateX(0); opacity: 1; }
-                        to { transform: translateX(100%); opacity: 0; }
-                    }
-                `;
-                document.head.appendChild(style);
-            }
-        }
+                if (notification.parentNode) {
+                    document.body.removeChild(notification);
+                }
+            }, 300);
+        }, 3000);
         
-        // Simpan ke localStorage
-        function saveToLocalStorage() {
-            const data = {
-                transactions: transactions,
-                nextId: nextId,
-                initialCashBalance: initialCashBalance,
-                initialEwalletBalance: initialEwalletBalance,
-                isInitialBalanceSet: isInitialBalanceSet,
-                lastUpdate: new Date().toISOString()
-            };
-            localStorage.setItem('cashflowData', JSON.stringify(data));
+        // Tambahkan animasi CSS jika belum ada
+        if (!document.getElementById('notification-styles')) {
+            const style = document.createElement('style');
+            style.id = 'notification-styles';
+            style.textContent = `
+                @keyframes slideInRight {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                
+                @keyframes slideOutRight {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(100%); opacity: 0; }
+                }
+                
+                @keyframes slideInUp {
+                    from { transform: translateY(100%); opacity: 0; }
+                    to { transform: translateY(0); opacity: 1; }
+                }
+                
+                @keyframes slideOutDown {
+                    from { transform: translateY(0); opacity: 1; }
+                    to { transform: translateY(100%); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
         }
+    }
+    
+    // Simpan ke localStorage
+    function saveToLocalStorage() {
+        const data = {
+            transactions: transactions,
+            nextId: nextId,
+            initialCashBalance: initialCashBalance,
+            initialEwalletBalance: initialEwalletBalance,
+            isInitialBalanceSet: isInitialBalanceSet,
+            lastUpdate: new Date().toISOString()
+        };
+        localStorage.setItem('cashflowData', JSON.stringify(data));
+    }
+    
+    // Load dari localStorage
+    function loadFromLocalStorage() {
+        const savedData = localStorage.getItem('cashflowData');
         
-        // Load dari localStorage
-        function loadFromLocalStorage() {
-            const savedData = localStorage.getItem('cashflowData');
-            
-            if (savedData) {
-                const data = JSON.parse(savedData);
-                transactions = data.transactions || [];
-                nextId = data.nextId || 1;
-                initialCashBalance = data.initialCashBalance || 0;
-                initialEwalletBalance = data.initialEwalletBalance || 0;
-                isInitialBalanceSet = data.isInitialBalanceSet || false;
-            }
+        if (savedData) {
+            const data = JSON.parse(savedData);
+            transactions = data.transactions || [];
+            nextId = data.nextId || 1;
+            initialCashBalance = data.initialCashBalance || 0;
+            initialEwalletBalance = data.initialEwalletBalance || 0;
+            isInitialBalanceSet = data.isInitialBalanceSet || false;
         }
-    </script>
+    }
+</script>
 </body>
 </html>

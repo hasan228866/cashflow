@@ -73,22 +73,29 @@
             z-index: -1;
         }
         
-        /* App Container */
+        /* App Container - Mobile First */
         .app-container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 24px;
+            padding: 12px;
             display: flex;
             flex-direction: column;
-            gap: 24px;
+            gap: 16px;
         }
         
-        /* Premium Header */
+        @media (min-width: 768px) {
+            .app-container {
+                padding: 24px;
+                gap: 24px;
+            }
+        }
+        
+        /* Premium Header - Mobile Optimized */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 32px;
+            padding: 16px;
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
             border-radius: var(--border-radius);
@@ -97,6 +104,16 @@
             margin-bottom: 8px;
             position: relative;
             overflow: hidden;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        
+        @media (min-width: 768px) {
+            .header {
+                padding: 20px 32px;
+                flex-wrap: nowrap;
+                gap: 0;
+            }
         }
         
         .header::before {
@@ -112,75 +129,134 @@
         .logo {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 12px;
             flex: 1;
             min-width: 0;
         }
         
+        @media (min-width: 768px) {
+            .logo {
+                gap: 16px;
+            }
+        }
+        
         .logo-icon {
-            width: 48px;
-            height: 48px;
+            width: 40px;
+            height: 40px;
             background: var(--gradient-primary);
-            border-radius: 14px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 22px;
+            font-size: 18px;
             flex-shrink: 0;
             box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
         }
         
+        @media (min-width: 768px) {
+            .logo-icon {
+                width: 48px;
+                height: 48px;
+                font-size: 22px;
+                border-radius: 14px;
+            }
+        }
+        
         .logo-text h1 {
             font-family: 'Poppins', sans-serif;
-            font-size: 1.8rem;
+            font-size: 1.2rem;
             font-weight: 700;
             color: var(--darker);
             line-height: 1.2;
-            letter-spacing: -0.5px;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        @media (min-width: 768px) {
+            .logo-text h1 {
+                font-size: 1.8rem;
+                letter-spacing: -0.5px;
+            }
         }
         
         .logo-text .tagline {
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             color: var(--gray);
             font-weight: 500;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.2px;
+        }
+        
+        @media (min-width: 768px) {
+            .logo-text .tagline {
+                font-size: 0.85rem;
+                letter-spacing: 0.3px;
+            }
         }
         
         .logo-badge {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            padding: 4px 10px;
+            gap: 4px;
+            padding: 3px 8px;
             background: var(--gradient-primary);
             color: white;
-            border-radius: 20px;
-            font-size: 0.75rem;
+            border-radius: 12px;
+            font-size: 0.65rem;
             font-weight: 600;
-            margin-left: 10px;
         }
         
-        /* Premium User Actions */
+        @media (min-width: 768px) {
+            .logo-badge {
+                padding: 4px 10px;
+                border-radius: 20px;
+                font-size: 0.75rem;
+                gap: 6px;
+            }
+        }
+        
+        /* Premium User Actions - Mobile Optimized */
         .user-actions {
             display: flex;
-            gap: 12px;
+            gap: 8px;
             align-items: center;
+            width: 100%;
+            justify-content: flex-end;
+        }
+        
+        @media (min-width: 768px) {
+            .user-actions {
+                width: auto;
+                gap: 12px;
+            }
         }
         
         .action-btn {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            padding: 12px 24px;
+            gap: 6px;
+            padding: 10px 16px;
             border: none;
             border-radius: var(--border-radius-xs);
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             cursor: pointer;
             transition: var(--transition);
             position: relative;
             overflow: hidden;
+            white-space: nowrap;
+        }
+        
+        @media (min-width: 768px) {
+            .action-btn {
+                gap: 8px;
+                padding: 12px 24px;
+                font-size: 0.9rem;
+            }
         }
         
         .action-btn::after {
@@ -224,69 +300,110 @@
         }
         
         .btn-icon {
-            width: 48px;
-            height: 48px;
-            padding: 0;
-            border-radius: var(--border-radius-xs);
-            font-size: 18px;
-        }
-        
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 8px 16px;
-            background: var(--light);
-            border-radius: var(--border-radius-xs);
-            cursor: pointer;
-            transition: var(--transition);
-        }
-        
-        .user-profile:hover {
-            background: var(--lighter);
-        }
-        
-        .user-avatar {
             width: 40px;
             height: 40px;
-            background: var(--gradient-primary);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
+            padding: 0;
+            border-radius: var(--border-radius-xs);
             font-size: 16px;
         }
         
-        /* Payment Method Selection */
+        @media (min-width: 768px) {
+            .btn-icon {
+                width: 48px;
+                height: 48px;
+                font-size: 18px;
+            }
+        }
+        
+        .user-profile {
+            display: none;
+        }
+        
+        @media (min-width: 768px) {
+            .user-profile {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 8px 16px;
+                background: var(--light);
+                border-radius: var(--border-radius-xs);
+                cursor: pointer;
+                transition: var(--transition);
+            }
+            
+            .user-profile:hover {
+                background: var(--lighter);
+            }
+            
+            .user-avatar {
+                width: 40px;
+                height: 40px;
+                background: var(--gradient-primary);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-weight: 600;
+                font-size: 16px;
+            }
+        }
+        
+        /* Payment Selection - Mobile Optimized */
         .payment-selection {
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
-            padding: 40px 20px;
+            padding: 24px 16px;
+        }
+        
+        @media (min-width: 768px) {
+            .payment-selection {
+                padding: 40px 20px;
+            }
         }
         
         .payment-selection-title {
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             font-weight: 700;
             color: var(--darker);
-            margin-bottom: 32px;
+            margin-bottom: 24px;
             font-family: 'Poppins', sans-serif;
+        }
+        
+        @media (min-width: 768px) {
+            .payment-selection-title {
+                font-size: 1.4rem;
+                margin-bottom: 32px;
+            }
         }
         
         .payment-options {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 24px;
+            grid-template-columns: 1fr;
+            gap: 16px;
             width: 100%;
-            max-width: 600px;
-            margin-bottom: 32px;
+            max-width: 400px;
+            margin-bottom: 24px;
+        }
+        
+        @media (min-width: 480px) {
+            .payment-options {
+                grid-template-columns: repeat(2, 1fr);
+                max-width: 600px;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .payment-options {
+                gap: 24px;
+                margin-bottom: 32px;
+            }
         }
         
         .payment-option {
-            padding: 32px 24px;
+            padding: 24px 16px;
             border: 2px solid var(--gray-light);
             border-radius: var(--border-radius-sm);
             cursor: pointer;
@@ -294,10 +411,17 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 16px;
+            gap: 12px;
             background: white;
             position: relative;
             overflow: hidden;
+        }
+        
+        @media (min-width: 768px) {
+            .payment-option {
+                padding: 32px 24px;
+                gap: 16px;
+            }
         }
         
         .payment-option:hover {
@@ -321,15 +445,23 @@
         }
         
         .payment-icon {
-            width: 80px;
-            height: 80px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 36px;
+            font-size: 28px;
             color: white;
             margin-bottom: 8px;
+        }
+        
+        @media (min-width: 768px) {
+            .payment-icon {
+                width: 80px;
+                height: 80px;
+                font-size: 36px;
+            }
         }
         
         .payment-option.cash .payment-icon {
@@ -346,15 +478,29 @@
         }
         
         .payment-name {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 700;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
+        }
+        
+        @media (min-width: 768px) {
+            .payment-name {
+                font-size: 1.2rem;
+                margin-bottom: 8px;
+            }
         }
         
         .payment-balance {
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             font-weight: 800;
-            letter-spacing: -0.5px;
+            letter-spacing: -0.3px;
+        }
+        
+        @media (min-width: 768px) {
+            .payment-balance {
+                font-size: 1.4rem;
+                letter-spacing: -0.5px;
+            }
         }
         
         .payment-option.cash .payment-balance {
@@ -370,33 +516,54 @@
         }
         
         .payment-option .payment-label {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--gray);
-            margin-top: 8px;
+            margin-top: 6px;
+        }
+        
+        @media (min-width: 768px) {
+            .payment-option .payment-label {
+                font-size: 0.85rem;
+                margin-top: 8px;
+            }
         }
         
         .payment-option.selected .payment-label {
             color: rgba(255, 255, 255, 0.9);
         }
         
-        /* Premium Stats Dashboard */
+        /* Premium Stats Dashboard - Mobile Optimized */
         .dashboard-stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
             margin-bottom: 16px;
+        }
+        
+        @media (min-width: 768px) {
+            .dashboard-stats {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 16px;
+            }
         }
         
         .stat-card {
             background: var(--glass-bg);
             backdrop-filter: blur(10px);
-            border-radius: var(--border-radius);
-            padding: 24px;
+            border-radius: var(--border-radius-sm);
+            padding: 16px;
             border: 1px solid var(--glass-border);
             box-shadow: var(--card-shadow);
             transition: var(--transition);
             position: relative;
             overflow: hidden;
+        }
+        
+        @media (min-width: 768px) {
+            .stat-card {
+                padding: 24px;
+                border-radius: var(--border-radius);
+            }
         }
         
         .stat-card::before {
@@ -405,7 +572,13 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 4px;
+            height: 3px;
+        }
+        
+        @media (min-width: 768px) {
+            .stat-card::before {
+                height: 4px;
+            }
         }
         
         .stat-card.income::before { background: var(--gradient-success); }
@@ -423,68 +596,115 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
+        }
+        
+        @media (min-width: 768px) {
+            .stat-header {
+                margin-bottom: 16px;
+            }
         }
         
         .stat-icon {
-            width: 56px;
-            height: 56px;
-            border-radius: 14px;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 18px;
             color: white;
             flex-shrink: 0;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        @media (min-width: 768px) {
+            .stat-icon {
+                width: 56px;
+                height: 56px;
+                border-radius: 14px;
+                font-size: 24px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            }
         }
         
         .stat-content {
             flex: 1;
             min-width: 0;
-            margin-left: 16px;
+            margin-left: 12px;
+        }
+        
+        @media (min-width: 768px) {
+            .stat-content {
+                margin-left: 16px;
+            }
         }
         
         .stat-title {
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             color: var(--gray);
             font-weight: 500;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
+            letter-spacing: 0.3px;
+            margin-bottom: 6px;
+        }
+        
+        @media (min-width: 768px) {
+            .stat-title {
+                font-size: 0.85rem;
+                letter-spacing: 0.5px;
+                margin-bottom: 8px;
+            }
         }
         
         .stat-value {
-            font-size: 1.8rem;
+            font-size: 1.3rem;
             font-weight: 700;
             color: var(--darker);
             line-height: 1.1;
-            letter-spacing: -0.5px;
-            margin-bottom: 8px;
+            letter-spacing: -0.3px;
+            margin-bottom: 6px;
+        }
+        
+        @media (min-width: 768px) {
+            .stat-value {
+                font-size: 1.8rem;
+                letter-spacing: -0.5px;
+                margin-bottom: 8px;
+            }
         }
         
         .stat-change {
             display: flex;
             align-items: center;
-            gap: 6px;
-            font-size: 0.8rem;
+            gap: 4px;
+            font-size: 0.7rem;
             font-weight: 500;
             color: var(--gray);
+            flex-wrap: wrap;
+        }
+        
+        @media (min-width: 768px) {
+            .stat-change {
+                font-size: 0.8rem;
+                gap: 6px;
+            }
         }
         
         .change-up { color: var(--success); }
         .change-down { color: var(--danger); }
         
-        /* Main Content Grid */
+        /* Main Content Grid - Mobile Optimized */
         .main-content {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 24px;
+            gap: 16px;
         }
         
         @media (min-width: 992px) {
             .main-content {
                 grid-template-columns: 1fr 1fr;
+                gap: 24px;
             }
         }
         
@@ -498,7 +718,7 @@
             animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
-        /* Premium Card Design */
+        /* Premium Card Design - Mobile Optimized */
         .card {
             background: var(--glass-bg);
             backdrop-filter: blur(10px);
@@ -514,48 +734,88 @@
         }
         
         .card-header {
-            padding: 24px;
+            padding: 20px;
             border-bottom: 1px solid var(--glass-border);
             display: flex;
             justify-content: space-between;
             align-items: center;
             background: rgba(255, 255, 255, 0.5);
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        
+        @media (min-width: 768px) {
+            .card-header {
+                padding: 24px;
+                flex-wrap: nowrap;
+                gap: 0;
+            }
         }
         
         .card-title {
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             font-weight: 700;
             color: var(--darker);
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             font-family: 'Poppins', sans-serif;
         }
         
+        @media (min-width: 768px) {
+            .card-title {
+                font-size: 1.3rem;
+                gap: 12px;
+            }
+        }
+        
         .card-title i {
-            font-size: 20px;
+            font-size: 18px;
             color: var(--primary);
         }
         
-        .card-body {
-            padding: 24px;
+        @media (min-width: 768px) {
+            .card-title i {
+                font-size: 20px;
+            }
         }
         
-        /* Back Button */
+        .card-body {
+            padding: 20px;
+        }
+        
+        @media (min-width: 768px) {
+            .card-body {
+                padding: 24px;
+            }
+        }
+        
+        /* Back Button - Mobile Optimized */
         .back-btn {
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: 10px 16px;
+            padding: 10px 14px;
             background: var(--light);
             border: 2px solid var(--gray-light);
             border-radius: var(--border-radius-xs);
             color: var(--dark);
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             cursor: pointer;
             transition: var(--transition);
-            margin-bottom: 24px;
+            margin-bottom: 16px;
+            width: 100%;
+            justify-content: center;
+        }
+        
+        @media (min-width: 768px) {
+            .back-btn {
+                width: auto;
+                padding: 10px 16px;
+                font-size: 0.9rem;
+                justify-content: flex-start;
+            }
         }
         
         .back-btn:hover {
@@ -564,28 +824,48 @@
             color: var(--primary);
         }
         
-        /* Transaction Method Display */
+        /* Transaction Method Display - Mobile Optimized */
         .transaction-method-display {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
             gap: 12px;
             padding: 16px;
             background: var(--primary-light);
             border-radius: var(--border-radius-sm);
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             border: 2px solid var(--primary);
+        }
+        
+        @media (min-width: 768px) {
+            .transaction-method-display {
+                flex-direction: row;
+                justify-content: center;
+                gap: 12px;
+                margin-bottom: 24px;
+            }
         }
         
         .method-badge {
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: 8px 16px;
+            padding: 8px 14px;
             background: white;
             border-radius: var(--border-radius-xs);
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            width: 100%;
+            justify-content: center;
+        }
+        
+        @media (min-width: 768px) {
+            .method-badge {
+                width: auto;
+                padding: 8px 16px;
+                font-size: 0.9rem;
+                justify-content: flex-start;
+            }
         }
         
         .method-badge.cash {
@@ -598,9 +878,15 @@
             border-left: 4px solid var(--ewallet-color);
         }
         
-        /* Premium Form Elements */
+        /* Premium Form Elements - Mobile Optimized */
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 16px;
+        }
+        
+        @media (min-width: 768px) {
+            .form-group {
+                margin-bottom: 20px;
+            }
         }
         
         .form-label {
@@ -608,22 +894,35 @@
             margin-bottom: 8px;
             font-weight: 600;
             color: var(--darker);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             display: flex;
             align-items: center;
             gap: 8px;
         }
         
+        @media (min-width: 768px) {
+            .form-label {
+                font-size: 0.9rem;
+            }
+        }
+        
         .form-control {
             width: 100%;
-            padding: 16px 20px;
+            padding: 14px 16px;
             border: 2px solid var(--gray-light);
             border-radius: var(--border-radius-xs);
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-family: 'Inter', sans-serif;
             transition: var(--transition);
             background: white;
             color: var(--darker);
+        }
+        
+        @media (min-width: 768px) {
+            .form-control {
+                padding: 16px 20px;
+                font-size: 1rem;
+            }
         }
         
         .form-control:focus {
@@ -642,19 +941,33 @@
         
         .amount-input-wrapper span {
             position: absolute;
-            left: 20px;
+            left: 16px;
             top: 50%;
             transform: translateY(-50%);
             font-weight: 600;
             color: var(--gray);
         }
         
+        @media (min-width: 768px) {
+            .amount-input-wrapper span {
+                left: 20px;
+            }
+        }
+        
         .amount-input {
-            padding-left: 50px !important;
+            padding-left: 45px !important;
             text-align: right;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 600;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
+        }
+        
+        @media (min-width: 768px) {
+            .amount-input {
+                padding-left: 50px !important;
+                font-size: 1.2rem;
+                letter-spacing: 0.5px;
+            }
         }
         
         .form-row {
@@ -669,16 +982,23 @@
             }
         }
         
-        /* Transaction Type Selector */
+        /* Transaction Type Selector - Mobile Optimized */
         .transaction-type-selector {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 24px;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        @media (min-width: 768px) {
+            .transaction-type-selector {
+                gap: 12px;
+                margin-bottom: 24px;
+            }
         }
         
         .type-option {
-            padding: 20px;
+            padding: 16px;
             border: 2px solid var(--gray-light);
             border-radius: var(--border-radius-sm);
             cursor: pointer;
@@ -687,18 +1007,37 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             background: white;
         }
         
+        @media (min-width: 768px) {
+            .type-option {
+                padding: 20px;
+                gap: 12px;
+            }
+        }
+        
         .type-option i {
-            font-size: 28px;
+            font-size: 24px;
             transition: var(--transition);
+        }
+        
+        @media (min-width: 768px) {
+            .type-option i {
+                font-size: 28px;
+            }
         }
         
         .type-option span {
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 0.95rem;
+        }
+        
+        @media (min-width: 768px) {
+            .type-option span {
+                font-size: 1rem;
+            }
         }
         
         .type-option.active {
@@ -715,28 +1054,30 @@
             background: var(--gradient-danger);
         }
         
-        /* Category Selector */
+        /* Category Selector - Mobile Optimized */
         .category-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            margin-bottom: 24px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
         }
         
-        @media (max-width: 768px) {
+        @media (min-width: 480px) {
             .category-grid {
-                grid-template-columns: repeat(3, 1fr);
+                grid-template-columns: repeat(4, 1fr);
             }
         }
         
-        @media (max-width: 480px) {
+        @media (min-width: 768px) {
             .category-grid {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(4, 1fr);
+                gap: 12px;
+                margin-bottom: 24px;
             }
         }
         
         .category-option {
-            padding: 16px 8px;
+            padding: 14px 8px;
             border: 2px solid var(--gray-light);
             border-radius: var(--border-radius-sm);
             cursor: pointer;
@@ -749,15 +1090,33 @@
             background: white;
         }
         
+        @media (min-width: 768px) {
+            .category-option {
+                padding: 16px 8px;
+            }
+        }
+        
         .category-option i {
-            font-size: 22px;
+            font-size: 20px;
             color: var(--gray);
         }
         
+        @media (min-width: 768px) {
+            .category-option i {
+                font-size: 22px;
+            }
+        }
+        
         .category-option span {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 500;
             color: var(--dark);
+        }
+        
+        @media (min-width: 768px) {
+            .category-option span {
+                font-size: 0.85rem;
+            }
         }
         
         .category-option:hover {
@@ -776,11 +1135,17 @@
             color: var(--primary);
         }
         
-        /* Premium Transaction List */
+        /* Premium Transaction List - Mobile Optimized */
         .transactions-container {
-            max-height: 500px;
+            max-height: 400px;
             overflow-y: auto;
             padding-right: 8px;
+        }
+        
+        @media (min-width: 768px) {
+            .transactions-container {
+                max-height: 500px;
+            }
         }
         
         .transactions-container::-webkit-scrollbar {
@@ -799,15 +1164,25 @@
         
         .transaction-item {
             display: flex;
-            align-items: center;
-            padding: 20px;
+            align-items: flex-start;
+            padding: 16px;
             border-bottom: 1px solid var(--glass-border);
             transition: var(--transition);
-            gap: 16px;
+            gap: 12px;
             background: white;
             border-radius: var(--border-radius-sm);
             margin-bottom: 8px;
             border: 1px solid transparent;
+            flex-wrap: wrap;
+        }
+        
+        @media (min-width: 768px) {
+            .transaction-item {
+                flex-wrap: nowrap;
+                padding: 20px;
+                gap: 16px;
+                align-items: center;
+            }
         }
         
         .transaction-item:hover {
@@ -817,16 +1192,26 @@
         }
         
         .transaction-icon {
-            width: 56px;
-            height: 56px;
-            border-radius: 14px;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 20px;
             color: white;
             flex-shrink: 0;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        @media (min-width: 768px) {
+            .transaction-icon {
+                width: 56px;
+                height: 56px;
+                border-radius: 14px;
+                font-size: 24px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            }
         }
         
         .transaction-income .transaction-icon {
@@ -846,29 +1231,51 @@
             font-weight: 600;
             margin-bottom: 6px;
             color: var(--darker);
-            font-size: 1.05rem;
+            font-size: 1rem;
             display: flex;
             align-items: center;
             gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        @media (min-width: 768px) {
+            .transaction-name {
+                font-size: 1.05rem;
+            }
         }
         
         .transaction-meta {
             display: flex;
             align-items: center;
-            gap: 12px;
-            font-size: 0.85rem;
+            gap: 10px;
+            font-size: 0.8rem;
             color: var(--gray);
             flex-wrap: wrap;
         }
         
+        @media (min-width: 768px) {
+            .transaction-meta {
+                font-size: 0.85rem;
+                gap: 12px;
+            }
+        }
+        
         .transaction-badge {
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 16px;
+            font-size: 0.7rem;
             font-weight: 500;
             display: inline-flex;
             align-items: center;
             gap: 4px;
+        }
+        
+        @media (min-width: 768px) {
+            .transaction-badge {
+                padding: 4px 10px;
+                border-radius: 20px;
+                font-size: 0.75rem;
+            }
         }
         
         .transaction-category {
@@ -890,10 +1297,24 @@
         
         .transaction-amount {
             font-weight: 700;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             white-space: nowrap;
-            letter-spacing: -0.5px;
+            letter-spacing: -0.3px;
             margin-left: auto;
+            width: 100%;
+            text-align: right;
+            margin-top: 8px;
+        }
+        
+        @media (min-width: 768px) {
+            .transaction-amount {
+                width: auto;
+                margin-top: 0;
+                margin-left: auto;
+                font-size: 1.3rem;
+                letter-spacing: -0.5px;
+                text-align: left;
+            }
         }
         
         .transaction-income .transaction-amount {
@@ -905,28 +1326,45 @@
         }
         
         .transaction-date {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--gray);
             white-space: nowrap;
+        }
+        
+        @media (min-width: 768px) {
+            .transaction-date {
+                font-size: 0.85rem;
+            }
         }
         
         .transaction-actions {
             display: flex;
             gap: 8px;
-            opacity: 0;
-            transition: var(--transition);
-        }
-        
-        .transaction-item:hover .transaction-actions {
             opacity: 1;
+            transition: var(--transition);
+            margin-top: 8px;
+            width: 100%;
+            justify-content: flex-end;
         }
         
-        /* Filter Bar */
+        @media (min-width: 768px) {
+            .transaction-actions {
+                width: auto;
+                margin-top: 0;
+                opacity: 0;
+            }
+            
+            .transaction-item:hover .transaction-actions {
+                opacity: 1;
+            }
+        }
+        
+        /* Filter Bar - Mobile Optimized */
         .filter-bar {
             display: flex;
             flex-direction: column;
-            gap: 16px;
-            margin-bottom: 24px;
+            gap: 12px;
+            margin-bottom: 20px;
         }
         
         @media (min-width: 768px) {
@@ -934,26 +1372,43 @@
                 flex-direction: row;
                 justify-content: space-between;
                 align-items: center;
+                gap: 16px;
+                margin-bottom: 24px;
             }
         }
         
         .filter-group {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        @media (min-width: 768px) {
+            .filter-group {
+                justify-content: flex-start;
+                gap: 8px;
+            }
         }
         
         .filter-btn {
-            padding: 10px 20px;
+            padding: 8px 16px;
             border: 2px solid var(--gray-light);
             border-radius: var(--border-radius-xs);
             background: white;
             color: var(--dark);
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             cursor: pointer;
             transition: var(--transition);
             white-space: nowrap;
+        }
+        
+        @media (min-width: 768px) {
+            .filter-btn {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
         }
         
         .filter-btn:hover {
@@ -969,7 +1424,7 @@
             box-shadow: 0 4px 12px rgba(67, 97, 238, 0.25);
         }
         
-        /* Premium Modal */
+        /* Premium Modal - Mobile Optimized */
         .modal {
             display: none;
             position: fixed;
@@ -982,8 +1437,15 @@
             z-index: 10000;
             align-items: center;
             justify-content: center;
-            padding: 24px;
+            padding: 16px;
             animation: fadeIn 0.3s ease;
+            overflow-y: auto;
+        }
+        
+        @media (min-width: 768px) {
+            .modal {
+                padding: 24px;
+            }
         }
         
         .modal.active {
@@ -995,7 +1457,7 @@
             backdrop-filter: blur(20px);
             border-radius: var(--border-radius);
             width: 100%;
-            max-width: 520px;
+            max-width: 500px;
             max-height: 90vh;
             overflow: hidden;
             border: 1px solid var(--glass-border);
@@ -1004,7 +1466,7 @@
         }
         
         .modal-header {
-            padding: 28px 32px;
+            padding: 24px;
             border-bottom: 1px solid var(--glass-border);
             display: flex;
             justify-content: space-between;
@@ -1012,14 +1474,27 @@
             background: rgba(255, 255, 255, 0.5);
         }
         
+        @media (min-width: 768px) {
+            .modal-header {
+                padding: 28px 32px;
+            }
+        }
+        
         .modal-title {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: 700;
             color: var(--darker);
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             font-family: 'Poppins', sans-serif;
+        }
+        
+        @media (min-width: 768px) {
+            .modal-title {
+                font-size: 1.5rem;
+                gap: 12px;
+            }
         }
         
         .modal-close {
@@ -1044,38 +1519,67 @@
         }
         
         .modal-body {
-            padding: 32px;
+            padding: 24px;
             overflow-y: auto;
             max-height: 60vh;
         }
         
+        @media (min-width: 768px) {
+            .modal-body {
+                padding: 32px;
+            }
+        }
+        
         .modal-footer {
-            padding: 24px 32px;
+            padding: 20px 24px;
             border-top: 1px solid var(--glass-border);
             display: flex;
             justify-content: flex-end;
-            gap: 16px;
+            gap: 12px;
             background: rgba(255, 255, 255, 0.5);
+            flex-wrap: wrap;
         }
         
-        /* Premium Export/Import */
+        @media (min-width: 768px) {
+            .modal-footer {
+                padding: 24px 32px;
+                gap: 16px;
+                flex-wrap: nowrap;
+            }
+        }
+        
+        /* Premium Export/Import - Mobile Optimized */
         .export-options {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 16px;
-            margin-bottom: 32px;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        
+        @media (min-width: 768px) {
+            .export-options {
+                gap: 16px;
+                margin-bottom: 32px;
+            }
         }
         
         .export-option {
             display: flex;
             align-items: center;
-            padding: 24px;
+            padding: 20px;
             border: 2px solid var(--gray-light);
             border-radius: var(--border-radius-sm);
             cursor: pointer;
             transition: var(--transition);
-            gap: 20px;
+            gap: 16px;
             background: white;
+        }
+        
+        @media (min-width: 768px) {
+            .export-option {
+                padding: 24px;
+                gap: 20px;
+            }
         }
         
         .export-option:hover {
@@ -1090,17 +1594,25 @@
         }
         
         .export-icon {
-            width: 64px;
-            height: 64px;
+            width: 56px;
+            height: 56px;
             background: var(--gradient-primary);
             border-radius: var(--border-radius-sm);
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 28px;
+            font-size: 24px;
             flex-shrink: 0;
             box-shadow: 0 4px 12px rgba(67, 97, 238, 0.25);
+        }
+        
+        @media (min-width: 768px) {
+            .export-icon {
+                width: 64px;
+                height: 64px;
+                font-size: 28px;
+            }
         }
         
         .export-option[data-format="excel"] .export-icon {
@@ -1112,32 +1624,56 @@
         }
         
         .export-info h4 {
-            font-size: 1.1rem;
+            font-size: 1rem;
             margin-bottom: 6px;
             color: var(--darker);
             font-weight: 600;
         }
         
+        @media (min-width: 768px) {
+            .export-info h4 {
+                font-size: 1.1rem;
+            }
+        }
+        
         .export-info p {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: var(--gray);
             line-height: 1.5;
         }
         
+        @media (min-width: 768px) {
+            .export-info p {
+                font-size: 0.9rem;
+            }
+        }
+        
         .import-section {
-            padding-top: 32px;
+            padding-top: 24px;
             border-top: 1px solid var(--glass-border);
+        }
+        
+        @media (min-width: 768px) {
+            .import-section {
+                padding-top: 32px;
+            }
         }
         
         .file-drop-area {
             border: 2px dashed var(--gray-light);
             border-radius: var(--border-radius-sm);
-            padding: 48px;
+            padding: 32px 24px;
             text-align: center;
             transition: var(--transition);
             background: white;
             cursor: pointer;
             position: relative;
+        }
+        
+        @media (min-width: 768px) {
+            .file-drop-area {
+                padding: 48px;
+            }
         }
         
         .file-drop-area:hover {
@@ -1151,32 +1687,53 @@
             transform: scale(1.02);
         }
         
-        /* Premium Footer */
+        /* Premium Footer - Mobile Optimized */
         .footer {
             text-align: center;
-            padding: 24px;
+            padding: 20px;
             color: var(--gray);
-            font-size: 0.85rem;
-            margin-top: 24px;
+            font-size: 0.8rem;
+            margin-top: 20px;
             border-top: 1px solid var(--glass-border);
         }
         
-        /* Premium Status Indicator */
+        @media (min-width: 768px) {
+            .footer {
+                padding: 24px;
+                font-size: 0.85rem;
+                margin-top: 24px;
+            }
+        }
+        
+        /* Premium Status Indicator - Mobile Optimized */
         .status-indicator {
             position: fixed;
-            top: 24px;
-            right: 24px;
+            top: 16px;
+            right: 16px;
             z-index: 9999;
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 10px 16px;
+            gap: 6px;
+            padding: 8px 12px;
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
             border-radius: var(--border-radius-xs);
             border: 1px solid var(--glass-border);
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             animation: slideIn 0.3s ease;
+            font-size: 0.8rem;
+            max-width: calc(100% - 32px);
+        }
+        
+        @media (min-width: 768px) {
+            .status-indicator {
+                top: 24px;
+                right: 24px;
+                padding: 10px 16px;
+                font-size: 0.9rem;
+                gap: 8px;
+                max-width: none;
+            }
         }
         
         .status-indicator.online {
@@ -1187,31 +1744,57 @@
             color: var(--danger);
         }
         
-        /* Empty State */
+        /* Empty State - Mobile Optimized */
         .empty-state {
             text-align: center;
-            padding: 48px 24px;
+            padding: 40px 20px;
+        }
+        
+        @media (min-width: 768px) {
+            .empty-state {
+                padding: 48px 24px;
+            }
         }
         
         .empty-icon {
-            font-size: 64px;
-            margin-bottom: 20px;
+            font-size: 56px;
+            margin-bottom: 16px;
             color: var(--gray-light);
         }
         
+        @media (min-width: 768px) {
+            .empty-icon {
+                font-size: 64px;
+                margin-bottom: 20px;
+            }
+        }
+        
         .empty-title {
-            font-size: 1.3rem;
-            margin-bottom: 12px;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
             color: var(--darker);
             font-weight: 600;
         }
         
+        @media (min-width: 768px) {
+            .empty-title {
+                font-size: 1.3rem;
+                margin-bottom: 12px;
+            }
+        }
+        
         .empty-text {
-            font-size: 1rem;
+            font-size: 0.95rem;
             color: var(--gray);
             max-width: 400px;
             margin: 0 auto;
             line-height: 1.6;
+        }
+        
+        @media (min-width: 768px) {
+            .empty-text {
+                font-size: 1rem;
+            }
         }
         
         /* Premium Animations */
@@ -1236,75 +1819,9 @@
             100% { transform: scale(1); }
         }
         
-        /* Premium Responsive Design */
-        @media (max-width: 768px) {
-            .app-container {
-                padding: 16px;
-                gap: 16px;
-            }
-            
-            .header {
-                padding: 16px;
-                flex-direction: column;
-                align-items: stretch;
-                gap: 16px;
-            }
-            
-            .logo {
-                justify-content: center;
-                text-align: center;
-            }
-            
-            .user-actions {
-                width: 100%;
-                justify-content: center;
-                flex-wrap: wrap;
-            }
-            
-            .dashboard-stats {
-                grid-template-columns: 1fr;
-            }
-            
-            .stat-card {
-                padding: 20px;
-            }
-            
-            .stat-value {
-                font-size: 1.5rem;
-            }
-            
-            .card-header,
-            .card-body {
-                padding: 20px;
-            }
-            
-            .payment-options {
-                grid-template-columns: 1fr;
-            }
-            
-            .transaction-item {
-                flex-wrap: wrap;
-            }
-            
-            .transaction-amount {
-                width: 100%;
-                text-align: right;
-                margin-top: 12px;
-            }
-            
-            .transaction-actions {
-                opacity: 1;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .transaction-type-selector {
-                grid-template-columns: 1fr;
-            }
-            
-            .modal-body {
-                padding: 20px;
-            }
+        /* Hidden utility class */
+        .hidden {
+            display: none !important;
         }
         
         /* Premium Custom Scrollbar */
@@ -1371,18 +1888,24 @@
             bottom: calc(100% + 8px);
         }
         
-        /* Premium Initial Balance Section */
+        /* Premium Initial Balance Section - Mobile Optimized */
         .initial-balance-section {
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
             border-radius: var(--border-radius);
-            padding: 32px;
+            padding: 24px;
             border: 1px solid var(--glass-border);
             box-shadow: var(--card-shadow);
             text-align: center;
             animation: slideUp 0.5s ease;
             position: relative;
             overflow: hidden;
+        }
+        
+        @media (min-width: 768px) {
+            .initial-balance-section {
+                padding: 32px;
+            }
         }
         
         .initial-balance-section::before {
@@ -1401,23 +1924,32 @@
         }
         
         .balance-label {
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             font-weight: 700;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             color: var(--darker);
             font-family: 'Poppins', sans-serif;
         }
         
-        .balance-inputs-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-            margin-bottom: 32px;
+        @media (min-width: 768px) {
+            .balance-label {
+                font-size: 1.4rem;
+                margin-bottom: 24px;
+            }
         }
         
-        @media (max-width: 768px) {
+        .balance-inputs-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        
+        @media (min-width: 768px) {
             .balance-inputs-container {
-                grid-template-columns: 1fr;
+                grid-template-columns: 1fr 1fr;
+                gap: 24px;
+                margin-bottom: 32px;
             }
         }
         
@@ -1427,25 +1959,40 @@
         
         .balance-input-wrapper span {
             position: absolute;
-            left: 20px;
+            left: 16px;
             top: 50%;
             transform: translateY(-50%);
             font-weight: 600;
             color: var(--gray);
-            font-size: 1.1rem;
+            font-size: 1rem;
+        }
+        
+        @media (min-width: 768px) {
+            .balance-input-wrapper span {
+                left: 20px;
+                font-size: 1.1rem;
+            }
         }
         
         .balance-input {
             width: 100%;
-            padding: 20px 20px 20px 60px;
+            padding: 18px 18px 18px 50px;
             border: 2px solid var(--gray-light);
             border-radius: var(--border-radius-sm);
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             font-weight: 700;
             text-align: right;
             transition: var(--transition);
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
             background: white;
+        }
+        
+        @media (min-width: 768px) {
+            .balance-input {
+                padding: 20px 20px 20px 60px;
+                font-size: 1.4rem;
+                letter-spacing: 0.5px;
+            }
         }
         
         .balance-input:focus {
@@ -1457,15 +2004,29 @@
         .balance-type-label {
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 12px;
+            gap: 10px;
+            margin-bottom: 10px;
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 0.95rem;
             color: var(--darker);
         }
         
+        @media (min-width: 768px) {
+            .balance-type-label {
+                gap: 12px;
+                margin-bottom: 12px;
+                font-size: 1rem;
+            }
+        }
+        
         .balance-type-label i {
-            font-size: 20px;
+            font-size: 18px;
+        }
+        
+        @media (min-width: 768px) {
+            .balance-type-label i {
+                font-size: 20px;
+            }
         }
         
         .balance-type-label.cash i {
@@ -1477,73 +2038,133 @@
         }
         
         .format-hint {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--gray);
             margin-top: 12px;
             text-align: left;
             line-height: 1.6;
-            padding: 16px;
+            padding: 14px;
             background: var(--light);
             border-radius: var(--border-radius-xs);
             border-left: 4px solid var(--primary);
         }
         
+        @media (min-width: 768px) {
+            .format-hint {
+                font-size: 0.85rem;
+                padding: 16px;
+            }
+        }
+        
         /* Continue Button */
         .continue-btn {
-            margin-top: 32px;
-            padding: 16px 40px;
-            font-size: 1.1rem;
+            margin-top: 24px;
+            padding: 14px 32px;
+            font-size: 1rem;
             font-weight: 600;
         }
         
-        /* Premium Mobile Menu */
+        @media (min-width: 768px) {
+            .continue-btn {
+                margin-top: 32px;
+                padding: 16px 40px;
+                font-size: 1.1rem;
+            }
+        }
+        
+        /* Premium Mobile Menu - Better implementation */
         .mobile-menu-toggle {
-            display: none;
+            display: block;
             background: transparent;
             border: none;
             font-size: 24px;
             color: var(--primary);
             cursor: pointer;
-            padding: 12px;
+            padding: 8px;
             border-radius: var(--border-radius-xs);
             transition: var(--transition);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        @media (min-width: 768px) {
+            .mobile-menu-toggle {
+                display: none;
+            }
         }
         
         .mobile-menu-toggle:hover {
             background: var(--primary-light);
         }
         
-        @media (max-width: 768px) {
-            .mobile-menu-toggle {
-                display: block;
-                position: absolute;
-                top: 20px;
-                right: 20px;
+        .user-actions.mobile-only {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            margin-top: 16px;
+            gap: 12px;
+            display: none;
+        }
+        
+        .user-actions.mobile-only.active {
+            display: flex;
+        }
+        
+        @media (min-width: 768px) {
+            .user-actions.mobile-only {
+                display: none !important;
             }
-            
-            .user-actions.desktop-only {
-                display: none;
+        }
+        
+        /* Quick Actions - Mobile Optimized */
+        .quick-actions-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        
+        @media (min-width: 768px) {
+            .quick-actions-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 16px;
             }
-            
-            .user-actions.mobile-menu {
-                display: none;
-                flex-direction: column;
-                width: 100%;
-                margin-top: 16px;
-                gap: 12px;
-            }
-            
-            .user-actions.mobile-menu.active {
-                display: flex;
-            }
+        }
+        
+        .quick-action-btn {
+            padding: 16px 12px;
+            border-radius: var(--border-radius-sm);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-align: center;
+            transition: var(--transition);
+            background: white;
+            border: 2px solid var(--gray-light);
+        }
+        
+        .quick-action-btn:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary);
+            box-shadow: 0 8px 24px rgba(67, 97, 238, 0.15);
+        }
+        
+        .quick-action-btn i {
+            font-size: 24px;
+            color: var(--primary);
         }
         
         /* Premium Notification */
         .notification {
             position: fixed;
-            top: 24px;
-            right: 24px;
-            padding: 16px 24px;
+            top: 16px;
+            right: 16px;
+            left: 16px;
+            padding: 14px 20px;
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
             border-radius: var(--border-radius-sm);
@@ -1555,6 +2176,16 @@
             z-index: 10000;
             animation: slideIn 0.3s ease;
             max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        @media (min-width: 768px) {
+            .notification {
+                top: 24px;
+                right: 24px;
+                left: auto;
+                padding: 16px 24px;
+            }
         }
         
         .notification.success {
@@ -1572,6 +2203,7 @@
         /* Premium Date Picker */
         input[type="date"] {
             position: relative;
+            height: 48px;
         }
         
         input[type="date"]::-webkit-calendar-picker-indicator {
@@ -1595,6 +2227,24 @@
         *:focus-visible {
             outline: 2px solid var(--primary);
             outline-offset: 2px;
+        }
+        
+        /* Touch-friendly improvements */
+        @media (max-width: 768px) {
+            button, 
+            .action-btn,
+            .filter-btn,
+            .category-option,
+            .type-option,
+            .payment-option {
+                min-height: 44px; /* Apple's recommended minimum touch target size */
+            }
+            
+            input,
+            select,
+            textarea {
+                font-size: 16px; /* Prevents iOS zoom on focus */
+            }
         }
     </style>
 </head>
@@ -1624,15 +2274,15 @@
             <div class="user-actions desktop-only">
                 <button class="action-btn btn-outline" id="import-btn" data-tooltip="Import Data">
                     <i class="fas fa-file-import"></i>
-                    <span>Import</span>
+                    <span class="desktop-text">Import</span>
                 </button>
                 <button class="action-btn btn-outline" id="export-btn" data-tooltip="Export Reports">
                     <i class="fas fa-file-export"></i>
-                    <span>Export</span>
+                    <span class="desktop-text">Export</span>
                 </button>
                 <button class="action-btn btn-primary" id="add-transaction-btn">
                     <i class="fas fa-plus-circle"></i>
-                    <span>New Transaction</span>
+                    <span class="desktop-text">New Transaction</span>
                 </button>
                 <div class="user-profile">
                     <div class="user-avatar">
@@ -1645,7 +2295,7 @@
                 </div>
             </div>
             
-            <div class="user-actions mobile-menu" id="mobile-menu">
+            <div class="user-actions mobile-only" id="mobile-menu">
                 <button class="action-btn btn-outline" id="mobile-import-btn">
                     <i class="fas fa-file-import"></i>
                     <span>Import Data</span>
@@ -1761,7 +2411,7 @@
                     
                     <!-- Selected Payment Method Display -->
                     <div class="transaction-method-display">
-                        <span>Selected Payment Method:</span>
+                        <span style="font-weight: 600; color: var(--darker);">Selected Payment:</span>
                         <div class="method-badge cash" id="selected-method-badge">
                             <i class="fas fa-money-bill-wave"></i>
                             <span id="selected-method-name">Cash</span>
@@ -2000,52 +2650,52 @@
                     </h2>
                 </div>
                 <div class="card-body">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                        <button class="action-btn btn-outline" id="quick-cash-income">
+                    <div class="quick-actions-grid">
+                        <button class="quick-action-btn" id="quick-cash-income">
                             <i class="fas fa-money-bill-wave"></i>
                             <div>
                                 <div style="font-weight: 600; font-size: 0.9rem;">Cash Income</div>
-                                <div style="font-size: 0.8rem; color: var(--gray);">Add cash money in</div>
+                                <div style="font-size: 0.75rem; color: var(--gray); margin-top: 4px;">Add cash money in</div>
                             </div>
                         </button>
                         
-                        <button class="action-btn btn-outline" id="quick-cash-expense">
+                        <button class="quick-action-btn" id="quick-cash-expense">
                             <i class="fas fa-shopping-cart"></i>
                             <div>
                                 <div style="font-weight: 600; font-size: 0.9rem;">Cash Expense</div>
-                                <div style="font-size: 0.8rem; color: var(--gray);">Spend cash money</div>
+                                <div style="font-size: 0.75rem; color: var(--gray); margin-top: 4px;">Spend cash money</div>
                             </div>
                         </button>
                         
-                        <button class="action-btn btn-outline" id="quick-ewallet-income">
+                        <button class="quick-action-btn" id="quick-ewallet-income">
                             <i class="fas fa-mobile-alt"></i>
                             <div>
                                 <div style="font-weight: 600; font-size: 0.9rem;">E-Wallet In</div>
-                                <div style="font-size: 0.8rem; color: var(--gray);">Add to digital wallet</div>
+                                <div style="font-size: 0.75rem; color: var(--gray); margin-top: 4px;">Add to digital wallet</div>
                             </div>
                         </button>
                         
-                        <button class="action-btn btn-outline" id="quick-ewallet-expense">
+                        <button class="quick-action-btn" id="quick-ewallet-expense">
                             <i class="fas fa-credit-card"></i>
                             <div>
                                 <div style="font-weight: 600; font-size: 0.9rem;">E-Wallet Out</div>
-                                <div style="font-size: 0.8rem; color: var(--gray);">Pay with digital wallet</div>
+                                <div style="font-size: 0.75rem; color: var(--gray); margin-top: 4px;">Pay with digital wallet</div>
                             </div>
                         </button>
                     </div>
                     
-                    <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--glass-border);">
+                    <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--glass-border);">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
                             <div>
                                 <div style="font-weight: 600; color: var(--darker);">Recent Activity</div>
-                                <div style="font-size: 0.85rem; color: var(--gray);">Last 5 transactions</div>
+                                <div style="font-size: 0.8rem; color: var(--gray);">Last 5 transactions</div>
                             </div>
                             <button class="action-btn btn-icon btn-outline" id="refresh-transactions" data-tooltip="Refresh">
                                 <i class="fas fa-sync-alt"></i>
                             </button>
                         </div>
-                        <div id="recent-transactions" style="font-size: 0.9rem; color: var(--gray);">
-                            No recent activity
+                        <div id="recent-transactions" style="font-size: 0.85rem; color: var(--gray);">
+                            <div style="text-align: center; padding: 20px; color: var(--gray);">No recent activity</div>
                         </div>
                     </div>
                 </div>
@@ -2055,7 +2705,7 @@
         <!-- Premium Footer -->
         <footer class="footer">
             <p>Privat Cashflow Pro Enterprise Edition • Advanced Financial Management Platform</p>
-            <p style="font-size: 0.8rem; margin-top: 8px; opacity: 0.7;">Real-time Sync • Enterprise Security • Professional Reporting</p>
+            <p style="font-size: 0.75rem; margin-top: 8px; opacity: 0.7;">Real-time Sync • Enterprise Security • Professional Reporting</p>
         </footer>
     </div>
     
@@ -2092,28 +2742,28 @@
                 </div>
                 
                 <div class="import-section">
-                    <h4 style="margin-bottom: 20px; color: var(--darker); font-size: 1.1rem;">
+                    <h4 style="margin-bottom: 16px; color: var(--darker); font-size: 1.1rem;">
                         <i class="fas fa-file-import"></i>
                         Import Data
                     </h4>
                     
                     <div class="file-input-wrapper">
-                        <input type="file" class="file-input" id="import-file" accept=".xlsx,.xls,.json">
+                        <input type="file" class="file-input" id="import-file" accept=".xlsx,.xls,.json" style="display: none;">
                         <div class="file-drop-area" id="file-drop-area">
-                            <i class="fas fa-cloud-upload-alt" style="font-size: 48px; color: var(--primary); margin-bottom: 16px;"></i>
-                            <p style="font-weight: 600; margin-bottom: 8px; color: var(--darker);">Drag & Drop or Click to Upload</p>
-                            <p style="font-size: 0.9rem; color: var(--gray);">Supported: Excel (.xlsx, .xls) and JSON backup files</p>
+                            <i class="fas fa-cloud-upload-alt" style="font-size: 40px; color: var(--primary); margin-bottom: 12px;"></i>
+                            <p style="font-weight: 600; margin-bottom: 6px; color: var(--darker);">Drag & Drop or Click to Upload</p>
+                            <p style="font-size: 0.85rem; color: var(--gray);">Supported: Excel (.xlsx, .xls) and JSON backup files</p>
                         </div>
                     </div>
                     
                     <div style="margin-top: 20px;">
-                        <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; cursor: pointer;">
+                        <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; cursor: pointer;">
                             <input type="radio" name="import-mode" value="replace" checked style="width: 18px; height: 18px;">
-                            <span>Replace all existing data</span>
+                            <span style="font-size: 0.9rem;">Replace all existing data</span>
                         </label>
-                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
                             <input type="radio" name="import-mode" value="append" style="width: 18px; height: 18px;">
-                            <span>Append to existing data</span>
+                            <span style="font-size: 0.9rem;">Append to existing data</span>
                         </label>
                     </div>
                 </div>
@@ -2136,7 +2786,7 @@
     const ENTERPRISE_CONFIG = {
         ABLY_API_KEY: 'MCZIZA.UBtc3g:k0y37USoNwpYAjfLXx37FxEvihZP0qlEZtRzmfEDh0c',
         CHANNEL_NAME: 'cashflow-enterprise-v2',
-        APP_VERSION: '3.1.0',
+        APP_VERSION: '3.2.0',
         COMPANY_NAME: 'Privat Cashflow Pro'
     };
 
@@ -2181,6 +2831,7 @@
         updateUIState();
         updatePaymentBalances();
         setupQuickActions();
+        setupFileDropArea();
     });
 
     function initEnterpriseApplication() {
@@ -2216,6 +2867,16 @@
                 }
             });
         }
+        
+        // Add touch event for better mobile experience
+        document.addEventListener('touchstart', (e) => {
+            if (mobileMenu.classList.contains('active') && 
+                !toggleBtn.contains(e.target) && 
+                !mobileMenu.contains(e.target)) {
+                mobileMenu.classList.remove('active');
+                toggleBtn.innerHTML = '<i class="fas fa-bars"></i>';
+            }
+        });
     }
 
     function updateUIState() {
@@ -2275,12 +2936,10 @@
                 // Remove selected class from all options
                 paymentOptions.forEach(opt => {
                     opt.classList.remove('selected');
-                    opt.querySelector('.payment-icon').style.border = 'none';
                 });
                 
                 // Add selected class to clicked option
                 this.classList.add('selected');
-                this.querySelector('.payment-icon').style.border = '2px solid rgba(255, 255, 255, 0.3)';
                 
                 // Store selected payment method
                 enterpriseState.selectedPaymentMethod = this.dataset.method;
@@ -2318,6 +2977,10 @@
             setTimeout(() => {
                 document.getElementById('transaction-name').focus();
             }, 300);
+            
+            // Close mobile menu if open
+            document.getElementById('mobile-menu').classList.remove('active');
+            document.getElementById('mobile-menu-toggle').innerHTML = '<i class="fas fa-bars"></i>';
         });
     }
 
@@ -2437,6 +3100,10 @@
         setTimeout(() => {
             document.getElementById('transaction-name').focus();
         }, 300);
+        
+        // Close mobile menu if open
+        document.getElementById('mobile-menu').classList.remove('active');
+        document.getElementById('mobile-menu-toggle').innerHTML = '<i class="fas fa-bars"></i>';
     }
 
     function setTransactionType(type) {
@@ -2467,15 +3134,15 @@
                           color: ${isIncome ? '#10b981' : '#ef4444'}; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
                         <i class="${category.icon}"></i>
                     </div>
-                    <div style="flex: 1;">
-                        <div style="font-weight: 600; color: var(--darker); font-size: 0.85rem;">${transaction.name}</div>
-                        <div style="font-size: 0.8rem; color: var(--gray); display: flex; gap: 8px;">
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="font-weight: 600; color: var(--darker); font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${transaction.name}</div>
+                        <div style="font-size: 0.8rem; color: var(--gray); display: flex; gap: 8px; flex-wrap: wrap;">
                             <span>${category.name}</span>
                             <span>•</span>
                             <span>${formatDate(transaction.date)}</span>
                         </div>
                     </div>
-                    <div style="font-weight: 700; color: ${isIncome ? '#10b981' : '#ef4444'}; font-size: 0.9rem;">
+                    <div style="font-weight: 700; color: ${isIncome ? '#10b981' : '#ef4444'}; font-size: 0.9rem; white-space: nowrap;">
                         ${isIncome ? '+' : '-'} ${formatCurrency(transaction.amount)}
                     </div>
                 </div>
@@ -2710,12 +3377,30 @@
         // Keyboard shortcuts
         document.addEventListener('keydown', handleEnterpriseShortcuts);
         
-        // File drop
-        setupFileDropArea();
-        
         // Payment selection
         setupPaymentSelection();
         setupBackToPayment();
+        
+        // Touch events for better mobile experience
+        setupTouchEvents();
+    }
+
+    function setupTouchEvents() {
+        // Prevent zoom on double tap for buttons
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('touchstart', (e) => {
+                if (e.touches.length > 1) e.preventDefault();
+            }, { passive: false });
+        });
+        
+        // Improve scrolling on mobile
+        document.querySelectorAll('.transactions-container').forEach(container => {
+            container.addEventListener('touchstart', (e) => {
+                if (container.scrollHeight > container.clientHeight) {
+                    e.stopPropagation();
+                }
+            });
+        });
     }
 
     // ==================== ENTERPRISE CORE FUNCTIONS ====================
@@ -2842,7 +3527,6 @@
         // Reset payment selection UI
         document.querySelectorAll('.payment-option').forEach(opt => {
             opt.classList.remove('selected');
-            opt.querySelector('.payment-icon').style.border = 'none';
         });
         document.getElementById('continue-to-transaction').disabled = true;
         document.getElementById('continue-to-transaction').style.opacity = '0.5';
@@ -2992,10 +3676,12 @@
     // ==================== ENTERPRISE EXPORT/IMPORT ====================
     function showEnterpriseModal() {
         document.getElementById('export-modal').classList.add('active');
+        document.body.style.overflow = 'hidden';
     }
 
     function closeEnterpriseModal() {
         document.getElementById('export-modal').classList.remove('active');
+        document.body.style.overflow = 'auto';
     }
 
     function exportEnterpriseData() {
@@ -3130,6 +3816,296 @@
         showNotification('Enterprise backup created successfully', 'success');
     }
 
+    // ==================== ENTERPRISE IMPORT ====================
+    async function importEnterpriseData() {
+        const fileInput = document.getElementById('import-file');
+        const files = fileInput.files;
+        
+        if (files.length === 0) {
+            showNotification('Please select a file to import', 'error');
+            return;
+        }
+        
+        const file = files[0];
+        const importMode = document.querySelector('input[name="import-mode"]:checked').value;
+        
+        try {
+            if (file.name.endsWith('.json')) {
+                await importEnterpriseJSON(file, importMode);
+            } else if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+                await importEnterpriseExcel(file, importMode);
+            } else {
+                showNotification('Unsupported file format', 'error');
+            }
+        } catch (error) {
+            console.error('Import error:', error);
+            showNotification('Import failed. Please check the file format.', 'error');
+        }
+        
+        // Reset file input
+        fileInput.value = '';
+        resetFileDropArea();
+    }
+
+    async function importEnterpriseJSON(file, importMode) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    // Validate JSON structure
+                    if (!data.transactions || !Array.isArray(data.transactions)) {
+                        throw new Error('Invalid backup file format');
+                    }
+                    
+                    if (importMode === 'replace') {
+                        // Replace all data
+                        enterpriseState.transactions = data.transactions || [];
+                        enterpriseState.nextId = data.nextId || (enterpriseState.transactions.length > 0 ? 
+                            Math.max(...enterpriseState.transactions.map(t => t.id)) + 1 : 1);
+                        
+                        if (data.configuration) {
+                            enterpriseState.initialCashBalance = data.configuration.initialCashBalance || 0;
+                            enterpriseState.initialEwalletBalance = data.configuration.initialEwalletBalance || 0;
+                            enterpriseState.isInitialBalanceSet = data.configuration.isInitialBalanceSet || false;
+                            
+                            // Update UI if balances are set
+                            if (enterpriseState.isInitialBalanceSet) {
+                                document.getElementById('initial-balance-section').classList.add('hidden');
+                                document.getElementById('payment-selection-section').style.display = 'block';
+                                document.getElementById('initial-cash-balance').value = formatNumber(enterpriseState.initialCashBalance);
+                                document.getElementById('initial-ewallet-balance').value = formatNumber(enterpriseState.initialEwalletBalance);
+                            }
+                        }
+                    } else {
+                        // Append data
+                        const existingIds = new Set(enterpriseState.transactions.map(t => t.id));
+                        const newTransactions = data.transactions.filter(t => !existingIds.has(t.id));
+                        
+                        // Update IDs to avoid conflicts
+                        newTransactions.forEach(t => {
+                            t.id = enterpriseState.nextId++;
+                        });
+                        
+                        enterpriseState.transactions.push(...newTransactions);
+                    }
+                    
+                    saveEnterpriseData();
+                    updateEnterpriseDashboard();
+                    updatePaymentBalances();
+                    renderEnterpriseTransactions();
+                    updateRecentTransactions();
+                    
+                    showNotification(`Successfully imported ${data.transactions.length} transactions`, 'success');
+                    closeEnterpriseModal();
+                    resolve();
+                    
+                } catch (error) {
+                    console.error('JSON import error:', error);
+                    showNotification('Invalid backup file format', 'error');
+                    reject(error);
+                }
+            };
+            
+            reader.onerror = function() {
+                showNotification('Error reading file', 'error');
+                reject(new Error('File read error'));
+            };
+            
+            reader.readAsText(file);
+        });
+    }
+
+    async function importEnterpriseExcel(file, importMode) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    
+                    // Check for transaction sheet
+                    let transactionSheet = workbook.Sheets['Transaction History'] || 
+                                          workbook.Sheets[workbook.SheetNames.find(name => 
+                                              name.toLowerCase().includes('transaction'))];
+                    
+                    if (!transactionSheet) {
+                        // Try first sheet
+                        transactionSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    }
+                    
+                    if (!transactionSheet) {
+                        throw new Error('No transaction data found in Excel file');
+                    }
+                    
+                    const jsonData = XLSX.utils.sheet_to_json(transactionSheet, { header: 1 });
+                    
+                    // Skip header row
+                    const rows = jsonData.slice(1);
+                    const newTransactions = [];
+                    
+                    rows.forEach((row, index) => {
+                        if (row.length >= 6) { // At least ID, Date, Type, Method, Name, Category
+                            const transaction = {
+                                id: enterpriseState.nextId++,
+                                date: row[1] || new Date().toISOString().split('T')[0],
+                                type: row[2]?.toLowerCase().includes('income') ? 'income' : 'expense',
+                                paymentMethod: row[3]?.toLowerCase().includes('cash') ? 'cash' : 'ewallet',
+                                name: row[4] || `Imported Transaction ${index + 1}`,
+                                category: getCategoryKey(row[5] || 'lainnya'),
+                                amount: parseFloat(row[6]) || 0,
+                                note: row[7] || '',
+                                createdAt: new Date().toISOString(),
+                                status: 'completed'
+                            };
+                            
+                            newTransactions.push(transaction);
+                        }
+                    });
+                    
+                    if (importMode === 'replace') {
+                        enterpriseState.transactions = newTransactions;
+                    } else {
+                        enterpriseState.transactions.push(...newTransactions);
+                    }
+                    
+                    saveEnterpriseData();
+                    updateEnterpriseDashboard();
+                    updatePaymentBalances();
+                    renderEnterpriseTransactions();
+                    updateRecentTransactions();
+                    
+                    showNotification(`Successfully imported ${newTransactions.length} transactions from Excel`, 'success');
+                    closeEnterpriseModal();
+                    resolve();
+                    
+                } catch (error) {
+                    console.error('Excel import error:', error);
+                    showNotification('Error importing Excel file. Please check the format.', 'error');
+                    reject(error);
+                }
+            };
+            
+            reader.onerror = function() {
+                showNotification('Error reading Excel file', 'error');
+                reject(new Error('File read error'));
+            };
+            
+            reader.readAsArrayBuffer(file);
+        });
+    }
+
+    function getCategoryKey(categoryName) {
+        const categoryMap = {
+            'salary': 'gaji',
+            'gaji': 'gaji',
+            'investment': 'investasi',
+            'investasi': 'investasi',
+            'food': 'makanan',
+            'makanan': 'makanan',
+            'transport': 'transportasi',
+            'transportasi': 'transportasi',
+            'entertainment': 'hiburan',
+            'hiburan': 'hiburan',
+            'shopping': 'belanja',
+            'belanja': 'belanja',
+            'health': 'kesehatan',
+            'kesehatan': 'kesehatan'
+        };
+        
+        const key = categoryName.toLowerCase();
+        return categoryMap[key] || 'lainnya';
+    }
+
+    // ==================== FILE DROP AREA ====================
+    function setupFileDropArea() {
+        const dropArea = document.getElementById('file-drop-area');
+        const fileInput = document.getElementById('import-file');
+        
+        if (!dropArea || !fileInput) return;
+        
+        // Prevent default drag behaviors
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+            document.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        // Highlight drop area when dragging over
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, () => {
+                dropArea.classList.add('dragover');
+            }, false);
+        });
+        
+        // Remove highlight
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, () => {
+                dropArea.classList.remove('dragover');
+            }, false);
+        });
+        
+        // Handle dropped files
+        dropArea.addEventListener('drop', handleDrop, false);
+        
+        function handleDrop(e) {
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                handleFileSelect({ target: fileInput });
+            }
+        }
+        
+        // Handle click to select file
+        dropArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        // Handle file selection
+        fileInput.addEventListener('change', handleFileSelect);
+        
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            if (files.length > 0) {
+                const file = files[0];
+                updateFileDropArea(file);
+            }
+        }
+    }
+
+    function updateFileDropArea(file) {
+        const dropArea = document.getElementById('file-drop-area');
+        if (!dropArea) return;
+        
+        const fileSize = formatFileSize(file.size);
+        const fileName = file.name.length > 30 ? file.name.substring(0, 27) + '...' : file.name;
+        
+        dropArea.innerHTML = `
+            <i class="fas fa-file" style="font-size: 40px; color: var(--primary); margin-bottom: 12px;"></i>
+            <p style="font-weight: 600; margin-bottom: 4px; color: var(--darker); font-size: 0.9rem;">${fileName}</p>
+            <p style="font-size: 0.8rem; color: var(--gray);">${fileSize} • Ready to import</p>
+        `;
+    }
+
+    function resetFileDropArea() {
+        const dropArea = document.getElementById('file-drop-area');
+        if (!dropArea) return;
+        
+        dropArea.innerHTML = `
+            <i class="fas fa-cloud-upload-alt" style="font-size: 40px; color: var(--primary); margin-bottom: 12px;"></i>
+            <p style="font-weight: 600; margin-bottom: 6px; color: var(--darker);">Drag & Drop or Click to Upload</p>
+            <p style="font-size: 0.85rem; color: var(--gray);">Supported: Excel (.xlsx, .xls) and JSON backup files</p>
+        `;
+        dropArea.classList.remove('dragover');
+    }
+
     // ==================== ENTERPRISE UTILITIES ====================
     function parseCurrencyInput(value) {
         if (!value) return 0;
@@ -3171,6 +4147,15 @@
     }
 
     function formatCurrency(amount) {
+        if (amount < 0) {
+            return '- ' + new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2
+            }).format(Math.abs(amount));
+        }
+        
         return new Intl.NumberFormat('id-ID', {
             style: 'currency',
             currency: 'IDR',
@@ -3187,21 +4172,29 @@
     }
 
     function formatDate(dateString) {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('id-ID', {
-            day: 'numeric',
-            month: 'short',
-            year: 'numeric'
-        });
+        try {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('id-ID', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            });
+        } catch (e) {
+            return dateString;
+        }
     }
 
     function formatDateForExcel(dateString) {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('id-ID', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric'
-        });
+        try {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('id-ID', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+        } catch (e) {
+            return dateString;
+        }
     }
 
     function formatFileSize(bytes) {
@@ -3271,6 +4264,9 @@
     }
 
     function showNotification(message, type = 'info') {
+        // Remove existing notifications
+        document.querySelectorAll('.notification').forEach(n => n.remove());
+        
         const notification = document.createElement('div');
         notification.className = `notification ${type}`;
         notification.innerHTML = `
@@ -3280,17 +4276,35 @@
         
         document.body.appendChild(notification);
         
+        // Auto-remove after 4 seconds
         setTimeout(() => {
-            notification.style.animation = 'slideIn 0.3s ease reverse forwards';
-            setTimeout(() => notification.remove(), 300);
+            if (notification.parentNode) {
+                notification.style.animation = 'slideIn 0.3s ease reverse forwards';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, 300);
+            }
         }, 4000);
+        
+        // Allow manual dismissal
+        notification.addEventListener('click', () => {
+            notification.style.animation = 'slideIn 0.3s ease reverse forwards';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 300);
+        });
     }
 
     function handleEnterpriseShortcuts(e) {
         // Ctrl+S for save transaction
         if ((e.ctrlKey || e.metaKey) && e.key === 's') {
             e.preventDefault();
-            document.getElementById('save-transaction').click();
+            const saveBtn = document.getElementById('save-transaction');
+            if (saveBtn) saveBtn.click();
         }
         
         // Ctrl+E for export
@@ -3305,6 +4319,9 @@
                 closeEnterpriseModal();
             } else if (document.getElementById('transaction-section').classList.contains('active')) {
                 document.getElementById('back-to-payment').click();
+            } else if (document.getElementById('mobile-menu').classList.contains('active')) {
+                document.getElementById('mobile-menu').classList.remove('active');
+                document.getElementById('mobile-menu-toggle').innerHTML = '<i class="fas fa-bars"></i>';
             }
         }
     }
@@ -3362,92 +4379,6 @@
             clientId: enterpriseState.userId,
             timestamp: new Date().toISOString()
         });
-    }
-
-    // ==================== ENTERPRISE IMPORT HELPERS ====================
-    async function importEnterpriseData() {
-        const fileInput = document.getElementById('import-file');
-        const files = fileInput.files;
-        
-        if (files.length === 0) {
-            showNotification('Please select a file to import', 'error');
-            return;
-        }
-        
-        const file = files[0];
-        const importMode = document.querySelector('input[name="import-mode"]:checked').value;
-        
-        try {
-            if (file.name.endsWith('.json')) {
-                await importEnterpriseJSON(file, importMode);
-            } else if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
-                await importEnterpriseExcel(file, importMode);
-            } else {
-                showNotification('Unsupported file format', 'error');
-            }
-        } catch (error) {
-            console.error('Import error:', error);
-            showNotification('Import failed. Please check the file format.', 'error');
-        }
-        
-        // Reset file input
-        fileInput.value = '';
-        document.getElementById('file-drop-area').innerHTML = `
-            <i class="fas fa-cloud-upload-alt" style="font-size: 48px; color: var(--primary); margin-bottom: 16px;"></i>
-            <p style="font-weight: 600; margin-bottom: 8px; color: var(--darker);">Drag & Drop or Click to Upload</p>
-            <p style="font-size: 0.9rem; color: var(--gray);">Supported: Excel (.xlsx, .xls) and JSON backup files</p>
-        `;
-        document.getElementById('file-drop-area').classList.remove('dragover');
-    }
-
-    // ==================== FILE DROP AREA ====================
-    function setupFileDropArea() {
-        const dropArea = document.getElementById('file-drop-area');
-        const fileInput = document.getElementById('import-file');
-        
-        if (!dropArea || !fileInput) return;
-        
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            dropArea.addEventListener(eventName, preventDefaults, false);
-        });
-        
-        function preventDefaults(e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-        
-        ['dragenter', 'dragover'].forEach(eventName => {
-            dropArea.addEventListener(eventName, () => {
-                dropArea.classList.add('dragover');
-            }, false);
-        });
-        
-        ['dragleave', 'drop'].forEach(eventName => {
-            dropArea.addEventListener(eventName, () => {
-                dropArea.classList.remove('dragover');
-            }, false);
-        });
-        
-        dropArea.addEventListener('drop', handleDrop, false);
-        fileInput.addEventListener('change', handleFileSelect, false);
-        
-        function handleDrop(e) {
-            const files = e.dataTransfer.files;
-            fileInput.files = files;
-            handleFileSelect({ target: fileInput });
-        }
-        
-        function handleFileSelect(e) {
-            const files = e.target.files;
-            if (files.length > 0) {
-                const file = files[0];
-                dropArea.innerHTML = `
-                    <i class="fas fa-file" style="font-size: 48px; color: var(--primary); margin-bottom: 16px;"></i>
-                    <p style="font-weight: 600; margin-bottom: 8px; color: var(--darker);">${file.name}</p>
-                    <p style="font-size: 0.9rem; color: var(--gray);">${formatFileSize(file.size)} • Ready to import</p>
-                `;
-            }
-        }
     }
 
     // ==================== GLOBAL EXPORTS ====================

@@ -667,21 +667,28 @@
             -webkit-overflow-scrolling: touch;
         }
         
+        /* PERBAIKAN: Desain Item Transaksi yang Lebih Baik */
         .transaction-item {
             display: flex;
             align-items: center;
-            padding: 12px;
+            padding: 14px;
             border-radius: var(--radius-sm);
             background: var(--card-bg);
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             border: 1px solid var(--card-border);
             transition: var(--transition);
             position: relative;
+            min-height: 70px;
+        }
+        
+        .transaction-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--card-shadow-hover);
         }
         
         .transaction-icon {
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             border-radius: var(--radius-sm);
             display: flex;
             align-items: center;
@@ -696,17 +703,18 @@
         .transaction-details {
             flex: 1;
             min-width: 0;
+            padding-right: 8px;
         }
         
         .transaction-title {
             font-size: 0.85rem;
             font-weight: 600;
             color: var(--text-primary);
-            margin-bottom: 4px;
+            margin-bottom: 5px;
             display: flex;
-            flex-wrap: wrap;
             align-items: center;
             gap: 4px;
+            line-height: 1.2;
         }
         
         .transaction-meta {
@@ -714,10 +722,11 @@
             flex-wrap: wrap;
             align-items: center;
             gap: 8px;
+            margin-bottom: 4px;
         }
         
         .transaction-category {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             padding: 3px 8px;
             border-radius: var(--radius-full);
             background: var(--lighter);
@@ -727,7 +736,7 @@
         }
         
         .transaction-payment {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: var(--text-tertiary);
             display: flex;
             align-items: center;
@@ -735,17 +744,26 @@
         }
         
         .transaction-date {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: var(--text-tertiary);
         }
         
+        /* PERBAIKAN: Posisi dan ukuran tombol delete yang lebih baik */
+        .transaction-right-section {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 8px;
+            margin-left: auto;
+            min-width: 90px;
+        }
+        
         .transaction-amount {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             font-weight: 700;
-            margin-left: 8px;
-            flex-shrink: 0;
             text-align: right;
-            min-width: 80px;
+            min-width: 70px;
         }
         
         .transaction-item.income .transaction-amount {
@@ -756,13 +774,32 @@
             color: var(--danger);
         }
         
+        /* PERBAIKAN: Tombol delete yang lebih kecil dan rapi */
         .transaction-actions {
             display: flex;
-            gap: 4px;
-            opacity: 1;
-            position: absolute;
-            right: 12px;
-            top: 12px;
+            justify-content: flex-end;
+            margin-top: 4px;
+        }
+        
+        .transaction-actions .delete-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 12px;
+            padding: 0;
+        }
+        
+        .transaction-actions .delete-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+            transform: scale(1.05);
         }
         
         /* Empty State - Mobile */
@@ -1296,6 +1333,49 @@
             }
             .user-profile {
                 padding: 6px;
+            }
+            
+            /* Responsive adjustment for transaction items */
+            .transaction-item {
+                padding: 12px;
+            }
+            
+            .transaction-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 14px;
+            }
+            
+            .transaction-right-section {
+                min-width: 80px;
+            }
+            
+            .transaction-amount {
+                font-size: 0.85rem;
+                min-width: 60px;
+            }
+            
+            .transaction-actions .delete-btn {
+                width: 26px;
+                height: 26px;
+                font-size: 11px;
+            }
+        }
+        
+        /* Responsive untuk layar kecil */
+        @media (max-width: 280px) {
+            .transaction-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+            
+            .transaction-right-section {
+                min-width: 70px;
+            }
+            
+            .transaction-amount {
+                font-size: 0.8rem;
             }
         }
     </style>
@@ -2235,13 +2315,15 @@
                             </span>
                         </div>
                     </div>
-                    <div class="transaction-amount">
-                        ${isIncome ? '+' : '-'} ${formatCurrency(transaction.amount)}
-                    </div>
-                    <div class="transaction-actions">
-                        <button class="action-btn btn-icon" onclick="deleteTransaction(${transaction.id})">
-                            <i class="fas fa-trash"></i>
-                        </button>
+                    <div class="transaction-right-section">
+                        <div class="transaction-amount">
+                            ${isIncome ? '+' : '-'} ${formatCurrency(transaction.amount)}
+                        </div>
+                        <div class="transaction-actions">
+                            <button class="delete-btn" onclick="deleteTransaction(${transaction.id})" title="Delete transaction">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             `;
@@ -2332,7 +2414,7 @@
             option.addEventListener('click', function() {
                 document.querySelectorAll('.type-option').forEach(opt => {
                     opt.style.borderColor = 'var(--gray-light)';
-                    opt.style.background = 'white';
+                    opt.style.background = 'var(--card-bg)';
                     opt.querySelector('i').style.color = 'var(--text-tertiary)';
                     opt.querySelector('div').style.color = 'var(--text-tertiary)';
                 });
